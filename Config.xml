@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Scatterplot>
+  <datafile>SubmissionData.xml</datafile>
+  <videoMarker>videoMarker.svg</videoMarker>
+  <pollMarker>pollMarker.svg</pollMarker>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>4</tuio_id>
+    <name>democratFilter</name>
+    <file>partyFilter_blue.svg</file>
+    <color>29,113,184</color>
+    <selectorFile>partySelector_blue.svg</selectorFile>
+    <rotation>
+      <facet_num>3</facet_num>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>29,113,184</color>
+        <answers>
+          <answer>
+            <answer_num>1,2</answer_num>
+            <answer_text>All Democrats</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>29,113,184</color>
+        <answers>
+          <answer>
+            <answer_num>1</answer_num>
+            <answer_text>Strong Democrat </answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>29,113,184</color>
+        <answers>
+          <answer>
+            <answer_num>2</answer_num>
+            <answer_text>Not very strong Democrat</answer_text>
+          </answer>
+        </answers>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>36</tuio_id>
+    <name>republicanFilter</name>
+    <file>partyFilter_red.svg</file>
+    <color>227,6,19</color>
+    <selectorFile>partySelector_red.svg</selectorFile>
+    <rotation>
+      <facet_num>3</facet_num>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>227,6,19</color>
+        <answers>
+          <answer>
+            <answer_num>6,7</answer_num>
+            <answer_text>All Republicans</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>227,6,19</color>
+        <answers>
+          <answer>
+            <answer_num>7</answer_num>
+            <answer_text>Strong Republican</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>227,6,19</color>
+        <answers>
+          <answer>
+            <answer_num>6</answer_num>
+            <answer_text>Not strong Republican</answer_text>
+          </answer>
+        </answers>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>32</tuio_id>
+    <name>independentFilter</name>
+    <file>partyFilter_yellow.svg</file>
+    <color>255,237,0</color>
+    <selectorFile>partySelector_yellow.svg</selectorFile>
+    <rotation>
+      <facet_num>4</facet_num>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>255,237,0</color>
+        <answers>
+          <answer>
+            <answer_num>3,4,5</answer_num>
+            <answer_text>All Democrats</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>255,237,0</color>
+        <answers>
+          <answer>
+            <answer_num>3</answer_num>
+            <answer_text>Lean Democrat/Ind</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>255,237,0</color>
+        <answers>
+          <answer>
+            <answer_num>4</answer_num>
+            <answer_text>Independent</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_type>single</facet_type>
+        <question_id>49</question_id>
+        <question_text>no print</question_text>
+        <color>255,237,0</color>
+        <answers>
+          <answer>
+            <answer_num>5</answer_num>
+            <answer_text>Lean Republican/Ind</answer_text>
+          </answer>
+        </answers>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>2</tuio_id>
+    <name>xAxisStarter</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+    <rotation>
+      <facet_num>3</facet_num>
+      <facet>
+        <facet_name>Income</facet_name>
+        <facet_type>interval</facet_type>
+        <question_id>46</question_id>
+        <range>
+          <value_start>1</value_start>
+          <value_end>8</value_end>
+          <increment>1</increment>
+        </range>
+        <answers>
+          <answer>
+            <answer_num>1</answer_num>
+            <answer_text>&lt; $10k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>2</answer_num>
+            <answer_text>10-20k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>3</answer_num>
+            <answer_text>20-30k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>4</answer_num>
+            <answer_text>30-40k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>5</answer_num>
+            <answer_text>40-50k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>6</answer_num>
+            <answer_text>50-75k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>7</answer_num>
+            <answer_text>75-100k</answer_text>
+          </answer>
+          <answer>
+            <answer_num>8</answer_num>
+            <answer_text>&gt; $100k</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_name>Occupation</facet_name>
+        <facet_type>nominal</facet_type>
+        <question_id>81</question_id>
+        <range>
+          <value_start>1</value_start>
+          <value_end>8</value_end>
+          <increment>1</increment>
+        </range>
+        <answers>
+          <answer>
+            <answer_num>1</answer_num>
+            <answer_text>Professional</answer_text>
+          </answer>
+          <answer>
+            <answer_num>2</answer_num>
+            <answer_text>White Collar</answer_text>
+          </answer>
+          <answer>
+            <answer_num>3</answer_num>
+            <answer_text>Blue Collar</answer_text>
+          </answer>
+          <answer>
+            <answer_num>4</answer_num>
+            <answer_text>Farmer/Rancher</answer_text>
+          </answer>
+          <answer>
+            <answer_num>5</answer_num>
+            <answer_text>Student</answer_text>
+          </answer>
+          <answer>
+            <answer_num>6</answer_num>
+            <answer_text>Homemaker</answer_text>
+          </answer>
+          <answer>
+            <answer_num>7</answer_num>
+            <answer_text>Retiree</answer_text>
+          </answer>
+          <answer>
+            <answer_num>8</answer_num>
+            <answer_text>Unemployed</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <facet_name>Economy Better or Worse?</facet_name>
+        <facet_type>nominal</facet_type>
+        <question_id>47</question_id>
+        <range>
+          <value_start>1</value_start>
+          <value_end>4</value_end>
+          <increment>1</increment>
+        </range>
+        <answers>
+          <answer>
+            <answer_num>1</answer_num>
+            <answer_text>Get Better</answer_text>
+          </answer>
+          <answer>
+            <answer_num>2</answer_num>
+            <answer_text>Get Worse</answer_text>
+          </answer>
+          <answer>
+            <answer_num>3</answer_num>
+            <answer_text>Stay Same</answer_text>
+          </answer>
+          <answer>
+            <answer_num>4</answer_num>
+            <answer_text>Not Sure</answer_text>
+          </answer>
+        </answers>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>46</tuio_id>
+    <name>xAxisLimiter</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>8</tuio_id>
+    <name>yAxisStarter</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+    <rotation>
+      <facet_num>2</facet_num>
+      <facet>
+        <facet_name>Age</facet_name>
+        <facet_type>ratio</facet_type>
+        <question_id>4</question_id>
+        <range>
+          <value_start>0</value_start>
+          <value_end>100 </value_end>
+          <increment>1</increment>
+        </range>
+      </facet>
+      <facet>
+        <facet_name>Obama or Romney</facet_name>
+        <facet_type>nominal</facet_type>
+        <question_id>5</question_id>
+        <range>
+          <value_start>1</value_start>
+          <value_end>7</value_end>
+          <increment>1</increment>
+        </range>
+        <answer_text>
+          <answer>
+            <answer_num>1 </answer_num>
+            <answer_text>Obama</answer_text>
+          </answer>
+          <answer>
+            <answer_num>2 </answer_num>
+            <answer_text>Likely Obama</answer_text>
+          </answer>
+          <answer>
+            <answer_num>3</answer_num>
+            <answer_text>Leaning Obama</answer_text>
+          </answer>
+          <answer>
+            <answer_num>4 </answer_num>
+            <answer_text>Undecided</answer_text>
+          </answer>
+          <answer>
+            <answer_num>5 </answer_num>
+            <answer_text>Leaning Romney</answer_text>
+          </answer>
+          <answer>
+            <answer_num>6</answer_num>
+            <answer_text>Likely Romney</answer_text>
+          </answer>
+          <answer>
+            <answer_num>7</answer_num>
+            <answer_text>Romney</answer_text>
+          </answer>
+        </answer_text>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>42</tuio_id>
+    <name>yAxisLimiter</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>100</tuio_id>
+    <name>questionChanger</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+    <rotation>
+      <facet_num>2</facet_num>
+      <facet>
+        <facet_name>questions</facet_name>
+        <facet_type>simple</facet_type>
+        <question>
+          <question_id>48</question_id>
+          <question_text>Priority: Boost Economy or Reduce Deficit?</question_text>
+        </question>
+        <question>
+          <question_id>88</question_id>
+          <question_text>Priority Issue?</question_text>
+        </question>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>200</tuio_id>
+    <name>responseFilter</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+    <rotation>
+      <facet_num>2</facet_num>
+      <facet>
+        <question_id>48</question_id>
+        <question_text>Priority: Boost Economy or Reduce Deficit?</question_text>
+        <range>5</range>
+        <answers>
+          <answer>
+            <answer_num>1 </answer_num>
+            <answer_text>Boost the economy</answer_text>
+          </answer>
+          <answer>
+            <answer_num>2 </answer_num>
+            <answer_text>Reduce the deficit</answer_text>
+          </answer>
+          <answer>
+            <answer_num>3 </answer_num>
+            <answer_text>Depends</answer_text>
+          </answer>
+          <answer>
+            <answer_num>4</answer_num>
+            <answer_text>Both</answer_text>
+          </answer>
+          <answer>
+            <answer_num>5</answer_num>
+            <answer_text>Not sure</answer_text>
+          </answer>
+        </answers>
+      </facet>
+      <facet>
+        <question_id>88</question_id>
+        <question_text>What's is Your Priority Issue?</question_text>
+        <range>5</range>
+        <answer_text>
+          <answer>
+            <answer_num>1</answer_num>
+            <answer_text>Job creation</answer_text>
+          </answer>
+          <answer>
+            <answer_num>2</answer_num>
+            <answer_text>Health care</answer_text>
+          </answer>
+          <answer>
+            <answer_num>3</answer_num>
+            <answer_text>Deficit &amp; gov spending</answer_text>
+          </answer>
+          <answer>
+            <answer_num>4</answer_num>
+            <answer_text>Energy costs</answer_text>
+          </answer>
+          <answer>
+            <answer_num>5</answer_num>
+            <answer_text>Immigration</answer_text>
+          </answer>
+        </answer_text>
+      </facet>
+    </rotation>
+  </tangible>
+  <tangible>
+    <label>no print</label>
+    <tuio_id>300</tuio_id>
+    <name>tagAndComparer</name>
+    <file>0</file>
+    <color>0</color>
+    <selectorFile>0</selectorFile>
+  </tangible>
+</Scatterplot>
