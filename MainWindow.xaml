@@ -6,7 +6,21 @@
     <Grid x:Name="RootGrid">
         <Label x:Name="LogMessageLabel" Foreground="{DynamicResource {x:Static s:SurfaceColors.Accent4BrushKey}}"     />
         <Canvas x:Name="MainCanvas">
-            
+            <!-- This line is updated to connect the center of ellipse and the description textbox. -->
+            <Line x:Name="ConnectingLine" 
+          Stroke="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 
+          Opacity="1" 
+          StrokeThickness="1" />
+
+            <!-- This TextBlock is used to display the touch device properties and values.  -->
+            <TextBlock x:Name="Description" 
+               Height="200" 
+               Width="500" 
+               FontSize="20" 
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlForegroundBrushKey}}" 
+               FontFamily="Segoe360"
+               FontWeight="Normal"
+               Opacity="1.0" Padding="11.0" />
         </Canvas>
     </Grid>
 </s:SurfaceWindow>
