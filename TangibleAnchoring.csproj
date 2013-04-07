@@ -52,6 +52,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Config\Answer.cs" />
+    <Compile Include="Config\Question.cs" />
+    <Compile Include="Config\Tangible.cs" />
+    <Compile Include="Criteria.cs" />
+    <Compile Include="TangibleVisualization.xaml.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>TangibleVisualization.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="VizOperationHelpers.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="Submissions\Response.cs" />
     <Compile Include="Submissions\Submission.cs" />
@@ -72,6 +81,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="TangibleVisualization.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -104,8 +117,11 @@
     <Resource Include="SubmissionData.xml">
       <SubType>Designer</SubType>
     </Resource>
-    <Resource Include="config.xml" />
+    <Resource Include="Config.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
