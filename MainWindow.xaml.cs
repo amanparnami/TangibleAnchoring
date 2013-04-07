@@ -55,6 +55,8 @@ namespace TangibleAnchoring
 
             DrawAxes();
             DrawPoints(submissionData);
+            //Criteria criteria = new Criteria("49","1,2");
+            //VizOperationFilter(criteria);
         }
 
         /// <summary>
@@ -129,6 +131,7 @@ namespace TangibleAnchoring
                     dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
                     dataPointEllipses[index].SetValue(Canvas.BottomProperty, bottomPosition);
                     dataPointEllipses[index].Name = "data_" + index;
+                    
                     //Dynamic assignment of touch event handler
                     dataPointEllipses[index].TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
                     dataPointEllipses[index].TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
@@ -170,20 +173,21 @@ namespace TangibleAnchoring
             haloEllipse.Width = 30;
             haloEllipse.Stroke = SurfaceColors.BulletBrush;
             haloEllipse.StrokeThickness = 2;
+            MainCanvas.Children.Remove(haloEllipse); //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
             MainCanvas.Children.Add(haloEllipse);
 
             int submissionIndex = int.Parse(senderEllipse.Name.Split('_')[1]);
-            Submission sData = submissionData.Submissions[submissionIndex];
+            Submission submission = submissionData.Submissions[submissionIndex];
             if (senderEllipse != null)
             {
-                LogMsg(sData.UserId);
+                LogMsg(submission.UserId);
 
                 //Interactively remove elements that have been touched (could make for a game)
                 //MainCanvas.Children.Remove(senderEllipse);
             }
 
             //This will produce details on demand
-            UpdateDescription(RootGrid, e.TouchDevice, sData, true);
+            UpdateDescription(RootGrid, e.TouchDevice, submission, true);
 
             // Capture to the ellipse.  
             //e.TouchDevice.Capture(senderEllipse);
@@ -230,7 +234,7 @@ namespace TangibleAnchoring
         /// description text will not go outside of this container's bounds</param>
         /// <param name="touchDevice">the touch device to diagram</param>
         /// <param name="showTouchDeviceInfo">Whether or not the touch device info will be visible</param>
-        private void UpdateDescription(Grid parentGrid, TouchDevice touchDevice, Submission sData, bool showTouchDeviceInfo)
+        private void UpdateDescription(Grid parentGrid, TouchDevice touchDevice, Submission submission, bool showTouchDeviceInfo)
         {
             // Show or hide the touchDevice info based on showTouchDeviceInfo
             Description.Visibility = showTouchDeviceInfo ? Visibility.Visible : Visibility.Hidden;
@@ -295,9 +299,9 @@ namespace TangibleAnchoring
             // Create the description string.
             StringBuilder descriptionText = new StringBuilder();
             //Show demographic info for submission data
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Respondent id: {0}", sData.UserId));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Age: {0}", sData.Age.ToString()));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Location: {0}, {1}", sData.Latitude.ToString(), sData.Longitude.ToString()));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Respondent id: {0}", submission.UserId));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Age: {0}", submission.Age.ToString()));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Location: {0}, {1}", submission.Latitude.ToString(), submission.Longitude.ToString()));
 
 
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "RecognizedTypes: {0}", GetTouchDeviceTypeString(touchDevice)));
@@ -383,6 +387,58 @@ namespace TangibleAnchoring
         }
 
         /// <summary>
+        /// Filter data based on criteria
+        /// </summary>
+        /// <param name="criteria">Compound variable that consists of questionId and answerIDs used for filtering</param>
+        private void VizOperationFilter(Criteria criteria) 
+        {
+            bool isMatch = false;
+            Submission tempSubmission;
+            int numPoints = dataPointEllipses.Length;
+            for (int i = 0; i < numPoints; i++)
+            {
+                int sIndex = int.Parse(dataPointEllipses[i].Name.Split('_')[1]);
+                tempSubmission = submissionData.Submissions[sIndex];
+                int numResponses = tempSubmission.Responses.Length;
+                for (int j = 0; j < numResponses; j++)
+                {
+                    if (tempSubmission.Responses[j].QuestionId == criteria.QuestionId)
+                    {
+                        int numAnswers = criteria.AnswerIds.Length;
+                        
+                        for (int k = 0; k < numAnswers; k++)
+                        {
+                            if (tempSubmission.Responses[j].AnswerId == criteria.AnswerIds[k])
+                            { //Found a match
+                                isMatch = true;
+                            }
+                        }
+                        if (!isMatch)
+                        {
+                            dataPointEllipses[i].Visibility = System.Windows.Visibility.Hidden;
+                        }
+                        else
+                        {
+                            isMatch = false; //Reset isMatch
+                            break;
+                        }
+                        
+                    }
+                }
+            }
+        }
+
+        private void VizOperationReset()
+        {
+            int numPoints = dataPointEllipses.Length;
+            for (int i = 0; i < numPoints; i++)
+            {
+                dataPointEllipses[i].Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+
+
+        /// <summary>
         /// Adds handlers for window availability events.
         /// </summary>
         private void AddWindowAvailabilityHandlers()
@@ -434,6 +490,89 @@ namespace TangibleAnchoring
         private void OnWindowUnavailable(object sender, EventArgs e)
         {
             //TODO: disable audio, animations here
+        }
+
+        /// <summary>
+        /// This is called when a tangible is put down on the table.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">Event object containing information about tagvisualization</param>
+        private void OnTangibleAdded(object sender, TagVisualizerEventArgs e)
+        {
+            TangibleVisualization camera = (TangibleVisualization)e.TagVisualization;
+            camera.CameraModel.Content = camera.Orientation;
+            camera.myEllipse.Fill = SurfaceColors.Accent1Brush;
+            Criteria criteria = new Criteria("49", "1,2");
+            VizOperationFilter(criteria);
+            //TangibleVisualization camera = (TangibleVisualization)e.TagVisualization;
+            //switch (camera.VisualizedTag.Value)
+            //{
+            //    case 193:
+            //        camera.CameraModel.Content = "Fabrikam, Inc. ABC-12";
+            //        camera.myEllipse.Fill = SurfaceColors.Accent1Brush;
+            //        break;
+            //    case 2:
+            //        camera.CameraModel.Content = "Fabrikam, Inc. DEF-34";
+            //        camera.myEllipse.Fill = SurfaceColors.Accent2Brush;
+            //        break;
+            //    case 3:
+            //        camera.CameraModel.Content = "Fabrikam, Inc. GHI-56";
+            //        camera.myEllipse.Fill = SurfaceColors.Accent3Brush;
+            //        break;
+            //    case 4:
+            //        camera.CameraModel.Content = "Fabrikam, Inc. JKL-78";
+            //        camera.myEllipse.Fill = SurfaceColors.Accent4Brush;
+            //        break;
+            //    default:
+            //        camera.CameraModel.Content = "UNKNOWN MODEL";
+            //        camera.myEllipse.Fill = SurfaceColors.ControlAccentBrush;
+            //        break;
+            //}
+        }
+
+        /// <summary>
+        /// This is called when a tangible is moved (rotation, translation) on the table.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">Event object containing information about tagvisualization</param>
+        private void OnTangibleMoved(object sender, TagVisualizerEventArgs e)
+        {
+            TangibleVisualization camera = (TangibleVisualization)e.TagVisualization;
+            double orientation = camera.Orientation;
+            camera.CameraModel.Content = orientation;
+            Criteria criteria;
+            VizOperationReset();
+
+            //TODO Code below is a POC of how a rotation tangible would work. Modify to make it react differently to different types of tangibles.
+            if (orientation > 0.0 && orientation <= 120.00)
+            {
+                criteria = new Criteria("49", "1,2");
+                VizOperationFilter(criteria);
+            }
+            else if (orientation > 120.0 && orientation <= 240.00)
+            {
+                criteria = new Criteria("49", "3,4");
+                VizOperationFilter(criteria);
+            }
+            else if (orientation > 240.0 && orientation < 360.00)
+            {
+                criteria = new Criteria("49", "5,6");
+                VizOperationFilter(criteria);
+            }
+
+        }
+
+        /// <summary>
+        /// This is called when a tangible is removed from the table. 
+        /// Note: This event is called only after the "LostTagTimeout" has completed, so expect delays, 
+        /// but be thankful otherwise things will start flickering due to instability of detection of a marker.   
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e">Event object containing information about tagvisualization</param>
+        private void OnTangibleRemoved(object sender, TagVisualizerEventArgs e)
+        {
+            //TODO: Replace next line with a better function that only undoes the effect of the tangible that was just removed and not resets everything.
+            VizOperationReset();
         }
     }
 }

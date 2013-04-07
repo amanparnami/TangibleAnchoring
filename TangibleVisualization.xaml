@@ -1,0 +1,25 @@
+﻿<s:TagVisualization x:Class="TangibleAnchoring.TangibleVisualization"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:s="http://schemas.microsoft.com/surface/2008"
+    Height="400" Width="400">
+    <Grid>
+        <Ellipse Stroke="Aqua"
+             StrokeThickness="21"
+             Fill="{x:Null}"
+             x:Name="myEllipse"
+             VerticalAlignment="Stretch"
+             HorizontalAlignment="Stretch"
+             Width="192"
+             Height="192"
+             Grid.ColumnSpan="1"             
+             Grid.RowSpan="1"
+             Grid.Column="1"
+             Grid.Row="1" />
+        <Label Name="CameraModel" 
+               Content="Model" 
+               HorizontalAlignment="Center" 
+               VerticalAlignment="Center"/>
+
+    </Grid>
+</s:TagVisualization>
