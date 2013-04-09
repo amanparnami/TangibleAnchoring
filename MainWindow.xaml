@@ -36,7 +36,8 @@
                Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlForegroundBrushKey}}" 
                FontFamily="Segoe360"
                FontWeight="Normal"
-               Opacity="1.0" Padding="11.0" />
+               Opacity="1.0" Padding="11.0" Panel.ZIndex="2"
+               />
             </Canvas>
         </s:TagVisualizer>
     </Grid>
