@@ -46,10 +46,11 @@ namespace TangibleAnchoring.Config
             tagId = xmlTangible.TagId;
             name = xmlTangible.Name;
 
-            int numFacets = xmlTangible.Rotation.Length;
-            rotation = new Facet[numFacets];
-            if (xmlTangible != null)
+            
+            if (xmlTangible.Rotation != null)
             {
+                int numFacets = xmlTangible.Rotation.Length;
+                rotation = new Facet[numFacets];
                 for (int index = 0; index < numFacets; ++index)
                 {
                     rotation[index] = new Facet(xmlTangible.Rotation[index]);

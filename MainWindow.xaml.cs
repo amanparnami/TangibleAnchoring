@@ -21,7 +21,8 @@ namespace TangibleAnchoring
     /// </summary>
     public partial class MainWindow : SurfaceWindow
     {
-        private const string submissionDataFile = "SubmissionData.xml";
+        private const string configFile = "Config.xml";
+        private readonly Config.Config configData;
         private readonly Submissions.SubmissionData submissionData;
         private Ellipse[] dataPointEllipses;
 
@@ -49,12 +50,14 @@ namespace TangibleAnchoring
             // Add handlers for window availability events
             AddWindowAvailabilityHandlers();
 
+            configData = new Config.Config(configFile);
             // Plug our item data into our visualizations
-            submissionData = new Submissions.SubmissionData(submissionDataFile);
+            submissionData = new Submissions.SubmissionData(configData.SubmissionsFileUri);
             dataPointEllipses = new Ellipse[submissionData.Submissions.Length];
-
-            DrawAxes();
-            DrawPoints(submissionData);
+            string length = " "+configData.Tangibles[0].Rotation.Length;
+            LogMsg(length);
+            //DrawAxes();
+            //DrawPoints(submissionData);
             //Criteria criteria = new Criteria("49","1,2");
             //VizOperationFilter(criteria);
         }

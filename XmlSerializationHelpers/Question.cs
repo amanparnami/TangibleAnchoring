@@ -26,7 +26,7 @@ namespace TangibleAnchoring.XmlSerializationHelpers
         }
 
         private Answer[] answers;
-        [XmlElement]
+        
         public Answer[] Answers
         {
             get { return answers; }

@@ -13,10 +13,10 @@ namespace TangibleAnchoring.XmlSerializationHelpers
         [XmlElement]
         public string SubmissionsFileUri;
 
-        [XmlElement]
+        
         public Tangible[] Tangibles;
 
-        [XmlElement]
+       
         public Question[] Questions;
 
         /// <summary>

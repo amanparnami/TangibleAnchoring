@@ -35,7 +35,7 @@ namespace TangibleAnchoring.XmlSerializationHelpers
         }
 
         private Facet[] rotation;
-        [XmlElement]
+        
         public Facet[] Rotation
         {
             get { return rotation; }
