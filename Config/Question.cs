@@ -24,20 +24,20 @@ namespace TangibleAnchoring.Config
             set { questionText = value; }
         }
 
-        //private ARange[] blah;
+        //private ARange[] answerRange;
 
         //public ARange[] AnswerRange
         //{
-        //    get { return blah; }
-        //    set { blah = value; }
+        //    get { return answerRange; }
+        //    set { answerRange = value; }
         //}
 
-        private string blah;
+        private string answerRange;
 
-        public string Blah
+        public string AnswerRange
         {
-            get { return blah; }
-            set { blah = value; }
+            get { return answerRange; }
+            set { answerRange = value; }
         }
 
 
@@ -55,7 +55,7 @@ namespace TangibleAnchoring.Config
         {
             questionId = xmlData.QuestionId;
             questionText = xmlData.QuestionText;
-            blah = xmlData.Blah;
+            answerRange = xmlData.AnswerRange;
 
             if (xmlData.Answers != null)
             {
@@ -71,10 +71,10 @@ namespace TangibleAnchoring.Config
             //if (xmlData.AnswerRange != null)
             //{
             //    int numRange = xmlData.AnswerRange.Length;
-            //    blah = new ARange[numRange];
+            //    answerRange = new ARange[numRange];
             //    for (int index = 0; index < numRange; index++)
             //    {
-            //        blah[index] = new ARange(xmlData.AnswerRange[index]);
+            //        answerRange[index] = new ARange(xmlData.AnswerRange[index]);
             //    }
             //}
         }

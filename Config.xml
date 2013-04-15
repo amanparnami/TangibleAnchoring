@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Config>
   <SubmissionsFileUri>SubmissionData.xml</SubmissionsFileUri>
   <VideoMarker>videoMarker.svg</VideoMarker>
@@ -9,29 +9,29 @@
       <TagId>4</TagId>
       <Name>Democrat</Name>
       <file>partyFilter_blue.svg</file>
-      <Color>29zx113zx184</Color>
+      <Color>29,113,184</Color>
       <selectorFile>partySelector_blue.svg</selectorFile>
       <Rotation>
         <Facet>
           <Type>single</Type>
           <Label>All Democrats</Label>
           <QuestionId>49</QuestionId>
-          <AnswerIds>1zx2</AnswerIds>
-          <Color>29zx113zx184</Color>
+          <AnswerIds>1,2</AnswerIds>
+          <Color>29,113,184</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Strong Democrat</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>1</AnswerIds>
-          <Color>29zx113zx184</Color>
+          <Color>29,113,184</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Democrat</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>2</AnswerIds>
-          <Color>29zx113zx184</Color>
+          <Color>29,113,184</Color>
         </Facet>
       </Rotation>
     </Tangible>
@@ -40,29 +40,29 @@
       <TagId>36</TagId>
       <Name>Republican</Name>
       <file>partyFilter_red.svg</file>
-      <Color>227zx6zx19</Color>
+      <Color>227,6,19</Color>
       <selectorFile>partySelector_red.svg</selectorFile>
       <Rotation>
         <Facet>
           <Type>single</Type>
           <Label>All Republicans</Label>
           <QuestionId>49</QuestionId>
-          <AnswerIds>6zx7</AnswerIds>
-          <Color>227zx6zx1</Color>
+          <AnswerIds>6,7</AnswerIds>
+          <Color>227,6,1</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Strong Republican</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>6</AnswerIds>
-          <Color>227zx6zx19</Color>
+          <Color>227,6,19</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Republican</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>7</AnswerIds>
-          <Color>227zx6zx1</Color>
+          <Color>227,6,1</Color>
         </Facet>
       </Rotation>
     </Tangible>
@@ -71,36 +71,36 @@
       <TagId>32</TagId>
       <Name>Inpdependent</Name>
       <file>partyFilter_yellow.svg</file>
-      <Color>255zx237zx0</Color>
+      <Color>255,237,0</Color>
       <selectorFile>partySelector_yellow.svg</selectorFile>
       <Rotation>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
-          <AnswerIds>3zx4zx5</AnswerIds>
+          <AnswerIds>3,4,5</AnswerIds>
           <Label>All Democrats</Label>
-          <Color>255zx237zx0</Color>
+          <Color>255,237,0</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
           <AnswerIds>3</AnswerIds>
           <Label>Ind - Lean Democrat</Label>
-          <Color>255zx237zx0</Color>
+          <Color>255,237,0</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
           <AnswerIds>4</AnswerIds>
           <Label>Independent</Label>
-          <Color>255zx237zx0</Color>
+          <Color>255,237,0</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
           <AnswerIds>5</AnswerIds>
           <Label>Ind - Lean Republican</Label>
-          <Color>255zx237zx0</Color>+
+          <Color>255,237,0</Color>+
         </Facet>
       </Rotation>
     </Tangible>
@@ -116,22 +116,22 @@
           <Label>Income</Label>
           <Type>interval</Type>
           <QuestionId>46</QuestionId>
-          <AnswerIds>1zx2zx3zx4zx5zx6zx7zx8</AnswerIds>
-          <FacetRange>1zx8zx1</FacetRange>
+          <AnswerIds>1,2,3,4,5,6,7,8</AnswerIds>
+          <FacetRange>1,8,1</FacetRange>
         </Facet>
         <Facet>
           <Label>Occupation</Label>
           <Type>nominal</Type>
           <QuestionId>81</QuestionId>
-          <AnswerIds>1zx2zx3zx4zx5zx6zx7zx8</AnswerIds>
-          <FacetRange>1zx8zx1</FacetRange>
+          <AnswerIds>1,2,3,4,5,6,7,8</AnswerIds>
+          <FacetRange>1,8,1</FacetRange>
         </Facet>
         <Facet>
           <Label>Economy Better or Worse?</Label>
           <Type>nominal</Type>
           <QuestionId>47</QuestionId>
-          <AnswerIds>1zx2zx3zx4</AnswerIds>
-          <FacetRange>1zx4zx1</FacetRange>
+          <AnswerIds>1,2,3,4</AnswerIds>
+          <FacetRange>1,4,1</FacetRange>
         </Facet>
       </Rotation>
     </Tangible>
@@ -155,14 +155,15 @@
           <Label>Age</Label>
           <Type>ratio</Type>
           <QuestionId>4</QuestionId>
-          <FacetRange>0zx100zx1</FacetRange>
+          <!-- startValue,endValue, increment-->
+          <FacetRange>0,100,1</FacetRange>
         </Facet>
         <Facet>
           <Label>Obama or Romney</Label>
           <Type>nominal</Type>
           <QuestionId>5</QuestionId>
-          <AnswerIds>1zx2zx3zx4zx5zx6zx7</AnswerIds>
-          <FacetRange>1zx7zx1</FacetRange>
+          <AnswerIds>1,2,3,4,5,6,7</AnswerIds>
+          <FacetRange>1,7,1</FacetRange>
         </Facet>
       </Rotation>
     </Tangible>
@@ -243,7 +244,6 @@
           <AnswerText>Immigration</AnswerText>
         </Answer>
       </Answers>
-    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>48</QuestionId>
@@ -270,7 +270,6 @@
           <AnswerText>Not sure</AnswerText>
         </Answer>
       </Answers>
-    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>5</QuestionId>
@@ -305,7 +304,6 @@
           <AnswerText>Romney</AnswerText>
         </Answer>
       </Answers>
-    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>47</QuestionId>
@@ -328,7 +326,6 @@
           <AnswerText>Not Sure</AnswerText>
         </Answer>
       </Answers>
-    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>49</QuestionId>
@@ -363,7 +360,6 @@
           <AnswerText>Strong Republican</AnswerText>
         </Answer>
       </Answers>
-    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>46</QuestionId>
@@ -402,7 +398,6 @@
           <AnswerText>&gt; $100k</AnswerText>
         </Answer>
       </Answers>
-    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>81</QuestionId>
@@ -441,12 +436,12 @@
           <AnswerText>Unemployed</AnswerText>
         </Answer>
       </Answers>
-      <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>4</QuestionId>
       <QuestionText>AGE</QuestionText>
-      <Blah>0zx100zx1</Blah>
+      <!-- startValue,endValue,increment-->
+      <AnswerRange>0,100,1</AnswerRange>
     </Question>
   </Questions>
 </Config>

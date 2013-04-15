@@ -9,45 +9,20 @@ namespace TangibleAnchoring.XmlSerializationHelpers
 {
     public class Facet
     {
-        private string label;
         [XmlElement]
-        public string Label
-        {
-            get { return label; }
-            set { label = value; }
-        }
+        public string Label;
 
-        private string type;
         [XmlElement]
-        public string Type
-        {
-            get { return type; }
-            set { type = value; }
-        }
+        public string Type;
 
-        private string questionId;
         [XmlElement]
-        public string QuestionId
-        {
-            get { return questionId; }
-            set { questionId = value; }
-        }
+        public string QuestionId;
 
-        private string answerIds;
         [XmlElement]
-        public string AnswerIds
-        {
-            get { return answerIds; }
-            set { answerIds = value; }
-        }
+        public string AnswerIds;
 
-        private string facetRange;
         [XmlElement]
-        public string FacetRange
-        {
-            get { return facetRange; }
-            set { facetRange = value; }
-        }
+        public string FacetRange;
 
     }
 }

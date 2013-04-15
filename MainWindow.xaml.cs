@@ -61,7 +61,7 @@ namespace TangibleAnchoring
 
             LogMsg(configData.Questions.Length.ToString());
 
-            //setQuestion("49");
+            setQuestion("49");
 
             // Initialize the XAxis
             XAxisLabel.Content = configData.FindQuestionFromId("46").QuestionText;
@@ -78,12 +78,10 @@ namespace TangibleAnchoring
 
             DrawPoints(submissionData);
             DrawTicks("XAxis");
-            LogMsg(configData.FindTangibleFromId("8").Rotation[0].FacetRange);
-            //LogMsg(CurrentQuestion.Uid);
-            //Criteria criteria = new Criteria("49","1,2");
-            //VizOperationFilter(criteria);
-
+            LogMsg(configData.FindQuestionFromId("4").AnswerRange);
             
+            //Criteria criteria = new Criteria("49","1,2");
+            //VizOperationFilter(criteria); 
         }
 
         /// <summary>

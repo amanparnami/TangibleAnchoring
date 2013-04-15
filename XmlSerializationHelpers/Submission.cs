@@ -9,69 +9,39 @@ namespace TangibleAnchoring.XmlSerializationHelpers
 {
     public class Submission
     {
-        private string pollId;
-        /// <summary>
+         /// <summary>
         /// Gets the poll questionId associated with the submission.
         /// </summary>
         [XmlElement]
-        public string PollId
-        {
-            get { return pollId; }
-            set { pollId = value; }
-        }
-
-        private string userId;
+        public string PollId;
+ 
         /// <summary>
         /// Gets the user/respondent questionId associated with the submission.
         /// </summary>
         [XmlElement]
-        public string UserId
-        {
-            get { return userId; }
-            set { userId = value; }
-        }
-
-        private double latitude;
+        public string UserId;
+ 
         /// <summary>
         /// Gets the position latitude associated with the submission.
         /// </summary>
         [XmlElement]
-        public double Latitude
-        {
-            get { return latitude; }
-            set { latitude = value; }
-        }
-
-        private double longitude;
+        public double Latitude;
+ 
         /// <summary>
         /// Gets the position longitude associated with the submission.
         /// </summary>
         [XmlElement]
-        public double Longitude
-        {
-            get { return longitude; }
-            set { longitude = value; }
-        }
+        public double Longitude;
         
-        private int age;
         /// <summary>
         /// Gets the age of the respondent associated with the submission.
         /// </summary>
         [XmlElement]
-        public int Age   
-        {
-            get { return age; }
-            set { age = value; }
-        }
+        public int Age;
 
-        private Response[] responses;
         /// <summary>
         /// Gets the responses to questions associated with the submission.
         /// </summary>
-        public Response[] Responses 
-        { 
-            get { return responses; }
-            set { responses = value; }
-        }
+        public Response[] Responses;
     }
 }
