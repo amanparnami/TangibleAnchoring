@@ -78,6 +78,7 @@ namespace TangibleAnchoring
 
             DrawPoints(submissionData);
             DrawTicks("XAxis");
+            DrawTicks("YAxis");
             LogMsg(configData.FindQuestionFromId("4").AnswerRange);
             
             //Criteria criteria = new Criteria("49","1,2");
@@ -128,33 +129,131 @@ namespace TangibleAnchoring
 
         private void DrawTicks(string axis)
         {
-            string qId; 
+            string qId;
+            SolidColorBrush tickLabelColorBrush = new SolidColorBrush();
+            tickLabelColorBrush.Color = SurfaceColors.ControlBorderColor;
             if (axis == "XAxis")
             {
                 qId = XAxis.Uid;
                 Question ques = configData.FindQuestionFromId(qId);
-                //int numAnswers = ques.Answers.Length;
-                //double step = XAxisLength / numAnswers;
-                //for (int index = 0; index < numAnswers; index++)
-                //{
-                //    Line tick = new Line();
-                //    tick.Name = "XTick_"+ index;
-                //    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
-                //    tick.X1 = XAxis.X1 + index*step;
-                //    tick.Y1 = XAxis.Y1 - 10.00;
-                //    tick.X2 = XAxis.X1 + index * step;
-                //    tick.Y2 = XAxis.Y1 + 10.00;
-                //    //xAxis.HorizontalAlignment = HorizontalAlignment.Left;
-                //    //xAxis.VerticalAlignment = VerticalAlignment.Center;
-                //    tick.StrokeThickness = 1;
-                //    MainCanvas.Children.Add(tick);
-                //}
+                int numAnswers = ques.Answers.Length;
+                double step = XAxisLength / numAnswers;
+                //Since we want to be able to spread the data points that align
+                // in a line for a value, the lowest value of XAxis will start from second tick
+                
+                for (int index = 0; index < numAnswers; index++)
+                {
+                    Line tick = new Line();
+                    tick.Name = "XTick_" + index;
+                    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                    tick.X1 = XAxis.X1 + index * step;
+                    tick.Y1 = XAxis.Y1 - 10.00;
+                    tick.X2 = tick.X1;
+                    tick.Y2 = XAxis.Y1 + 10.00;
+                    tick.StrokeThickness = 1;
+                    MainCanvas.Children.Add(tick);
+
+                    Label tLabel = new Label();
+                    tLabel.Name = "XTickLabel_" + index;
+                    tLabel.Foreground = tickLabelColorBrush;
+                    tLabel.FontSize = 18;
+                    tLabel.Content = ques.Answers[index].AnswerText;
+                    tLabel.SetValue(Canvas.LeftProperty, tick.X1 + step / 2 - (tLabel.Content.ToString().Length * (tLabel.FontSize * 0.75))/2);
+                    tLabel.SetValue(Canvas.TopProperty, tick.Y1 + 20);
+                    MainCanvas.Children.Add(tLabel);
+                }
             } 
             else if (axis == "YAxis")
             {
                 qId = YAxis.Uid;
                 Question ques = configData.FindQuestionFromId(qId);
-                
+                if (ques.Answers != null)
+                {
+                    int numAnswers = ques.Answers.Length;
+                    double step = YAxisLength / numAnswers;
+                    for (int index = 0; index < numAnswers; index++)
+                    {
+                        Line tick = new Line();
+                        tick.Name = "YTick_" + index;
+                        tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                        tick.X1 = YAxis.X1 - 10.00 ;
+                        tick.Y1 = YAxis.Y1 + (numAnswers - index) * step;
+                        tick.X2 = YAxis.X1 + 10.00;
+                        tick.Y2 = tick.Y1;
+                        tick.StrokeThickness = 1;
+                        MainCanvas.Children.Add(tick);
+
+                        Label tLabel = new Label();
+                        tLabel.Name = "YTickLabel_" + index;
+                        tLabel.Foreground = tickLabelColorBrush;
+                        tLabel.FontSize = 18;
+                        tLabel.Content = ques.Answers[index].AnswerText;
+                        tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
+                        tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                        MainCanvas.Children.Add(tLabel);
+                    }
+                } else if (ques.AnswerRange != null)
+                {
+                    string[] answerRangeArr = ques.AnswerRange.Split(',');
+                    //ASSUMPTION start and end value are integers only
+                    int startValue = int.Parse(answerRangeArr[0]);
+                    int endValue = int.Parse(answerRangeArr[1]);
+                    int increment = int.Parse(answerRangeArr[2]);
+                    int range = endValue - startValue;
+
+                    if (range <= 10)
+                    {
+                        double step = YAxisLength / range;
+                        for (int index = startValue; index <= endValue; index++)
+                        {
+                            Line tick = new Line();
+                            tick.Name = "YTick_" + index;
+                            tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                            tick.X1 = YAxis.X1 - 10.00;
+                            tick.Y1 = YAxis.Y1 + (endValue - index) * step;
+                            tick.X2 = YAxis.X1 + 10.00;
+                            tick.Y2 = tick.Y1;
+                            tick.StrokeThickness = 1;
+                            MainCanvas.Children.Add(tick);
+
+                            Label tLabel = new Label();
+                            tLabel.Name = "YTickLabel_" + index;
+                            tLabel.Foreground = tickLabelColorBrush;
+                            tLabel.FontSize = 18;
+                            tLabel.Content = index;
+                            tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
+                            tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                            MainCanvas.Children.Add(tLabel);
+                        }
+                    }
+                    else if (range > 10)
+                    {
+                        double step = YAxisLength / 10;
+                        //TODO take into account the increment if it is different than 1
+                        for (int index = 0; index < 10; index++)
+                        {
+                            Line tick = new Line();
+                            tick.Name = "YTick_" + index;
+                            tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                            tick.X1 = YAxis.X1 - 10.00;
+                            tick.Y1 = YAxis.Y1 + (10 - index) * step;
+                            tick.X2 = YAxis.X1 + 10.00;
+                            tick.Y2 = tick.Y1;
+                            tick.StrokeThickness = 1;
+                            MainCanvas.Children.Add(tick);
+
+                            Label tLabel = new Label();
+                            tLabel.Name = "YTickLabel_" + index;
+                            tLabel.Foreground = tickLabelColorBrush;
+                            tLabel.FontSize = 18;
+                            tLabel.Content = (range / 10.00) * index; 
+                            tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
+                            tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                            MainCanvas.Children.Add(tLabel);
+
+                        }
+                    }
+                }
             }
 
         }
