@@ -19,12 +19,12 @@ namespace TangibleAnchoring.Submissions
         private readonly Response[] responses;
 
         /// <summary>
-        /// Gets the poll id associated with the submission.
+        /// Gets the poll questionId associated with the submission.
         /// </summary>
         public string PollId { get { return pollId; } }
 
         /// <summary>
-        /// Gets the user/respondent id associated with the submission.
+        /// Gets the user/respondent questionId associated with the submission.
         /// </summary>
         public string UserId { get { return userId; } }
 

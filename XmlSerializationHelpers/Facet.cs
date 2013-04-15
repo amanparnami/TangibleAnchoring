@@ -41,6 +41,13 @@ namespace TangibleAnchoring.XmlSerializationHelpers
             set { answerIds = value; }
         }
 
-        
+        private string facetRange;
+        [XmlElement]
+        public string FacetRange
+        {
+            get { return facetRange; }
+            set { facetRange = value; }
+        }
+
     }
 }

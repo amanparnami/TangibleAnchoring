@@ -40,12 +40,22 @@ namespace TangibleAnchoring.Config
             set { answerIds = value; }
         }
 
+        private string facetRange;
+
+        public string FacetRange
+        {
+            get { return facetRange; }
+            set { facetRange = value; }
+        }
+
+
         public Facet(XmlSerializationHelpers.Facet xmlData)
         {
             label = xmlData.Label;
             type = xmlData.Type;
             questionId = xmlData.QuestionId;
             answerIds = xmlData.AnswerIds;
+            facetRange = xmlData.FacetRange;
         }
     }
 }

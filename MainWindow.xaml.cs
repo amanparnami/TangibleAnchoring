@@ -13,6 +13,7 @@ using Microsoft.Surface.Presentation.Controls;
 using Microsoft.Surface.Presentation.Input;
 using System.Globalization;
 using TangibleAnchoring.Submissions;
+using TangibleAnchoring.Config;
 
 namespace TangibleAnchoring
 {
@@ -25,6 +26,7 @@ namespace TangibleAnchoring
         private readonly Config.Config configData;
         private readonly Submissions.SubmissionData submissionData;
         private Ellipse[] dataPointEllipses;
+        Ellipse haloEllipse = new Ellipse();
 
         //WA = Work Area
 
@@ -36,7 +38,9 @@ namespace TangibleAnchoring
         private double bottomMargin = 50;
         private double rightMargin = 50;
         private double topMargin = 50;
-        Ellipse haloEllipse = new Ellipse();
+        private double YAxisLength;
+        private double XAxisLength;
+        
 
         // The following distances specify how far the description textbox should be
         // from the center of the touch device.
@@ -54,12 +58,32 @@ namespace TangibleAnchoring
             // Plug our item data into our visualizations
             submissionData = new Submissions.SubmissionData(configData.SubmissionsFileUri);
             dataPointEllipses = new Ellipse[submissionData.Submissions.Length];
-            string length = " "+configData.Tangibles[0].Rotation.Length;
-            LogMsg(length);
-            //DrawAxes();
-            //DrawPoints(submissionData);
+
+            LogMsg(configData.Questions.Length.ToString());
+
+            //setQuestion("49");
+
+            // Initialize the XAxis
+            XAxisLabel.Content = configData.FindQuestionFromId("46").QuestionText;
+            XAxisLabel.Uid = "46";
+            XAxis.Uid = "46";
+
+            // Initialize the YAxis
+            YAxisLabel.Content = configData.FindQuestionFromId("4").QuestionText;
+            YAxisLabel.Uid = "4";
+            YAxis.Uid = "4";
+
+            YAxisLength = YAxis.Y2 - YAxis.Y1;
+            XAxisLength = XAxis.X2 - XAxis.X1;
+
+            DrawPoints(submissionData);
+            DrawTicks("XAxis");
+            LogMsg(configData.FindTangibleFromId("8").Rotation[0].FacetRange);
+            //LogMsg(CurrentQuestion.Uid);
             //Criteria criteria = new Criteria("49","1,2");
             //VizOperationFilter(criteria);
+
+            
         }
 
         /// <summary>
@@ -74,34 +98,76 @@ namespace TangibleAnchoring
         /// <summary>
         /// Logic for drawing X, Y axes.
         /// </summary>
-        private void DrawAxes()
+        //private void DrawAxes()
+        //{
+
+        //    string message = "WA: W= " + screenWidth + " H= " + screenHeight;
+        //    LogMsg(message);
+        //    Line xAxis = new Line(), yAxis = new Line();
+        //    //xAxis.Name = "XAxis";
+        //    //xAxis.Stroke = System.Windows.Media.Brushes.Beige;
+        //    //xAxis.X1 = leftMargin / 2;
+        //    //xAxis.Y1 = WAHeight - bottomMargin / 2;
+        //    //xAxis.X2 = WAWidth - rightMargin;
+        //    //xAxis.Y2 = xAxis.Y1;
+        //    ////xAxis.HorizontalAlignment = HorizontalAlignment.Left;
+        //    ////xAxis.VerticalAlignment = VerticalAlignment.Center;
+        //    //xAxis.StrokeThickness = 1;
+        //    //MainCanvas.Children.Add(xAxis);
+
+        //    //yAxis.Stroke = System.Windows.Media.Brushes.Beige;
+        //    //xAxis.Name = "YAxis";
+        //    //yAxis.X1 = leftMargin / 2;
+        //    //yAxis.Y1 = WAHeight - bottomMargin / 2;
+        //    //yAxis.X2 = yAxis.X1;
+        //    //yAxis.Y2 = bottomMargin + topMargin;
+        //    ////yAxis.HorizontalAlignment = HorizontalAlignment.Left;
+        //    ////yAxis.VerticalAlignment = VerticalAlignment.Center;
+        //    //yAxis.StrokeThickness = 1;
+        //    //MainCanvas.Children.Add(yAxis);
+
+        //}
+
+        private void DrawTicks(string axis)
         {
-
-            string message = "workarea: width = " + screenWidth + " height = " + screenHeight;
-            LogMsg(message);
-            Line xAxis = new Line(), yAxis = new Line();
-            xAxis.Stroke = System.Windows.Media.Brushes.Beige;
-            xAxis.X1 = leftMargin / 2;
-            xAxis.Y1 = WAHeight - bottomMargin / 2;
-            xAxis.X2 = WAWidth - rightMargin;
-            xAxis.Y2 = xAxis.Y1;
-            //xAxis.HorizontalAlignment = HorizontalAlignment.Left;
-            //xAxis.VerticalAlignment = VerticalAlignment.Center;
-            xAxis.StrokeThickness = 2;
-            MainCanvas.Children.Add(xAxis);
-
-            yAxis.Stroke = System.Windows.Media.Brushes.Aqua;
-            yAxis.X1 = leftMargin / 2;
-            yAxis.Y1 = WAHeight - bottomMargin / 2;
-            yAxis.X2 = yAxis.X1;
-            yAxis.Y2 = bottomMargin + topMargin;
-            //yAxis.HorizontalAlignment = HorizontalAlignment.Left;
-            //yAxis.VerticalAlignment = VerticalAlignment.Center;
-            yAxis.StrokeThickness = 2;
-            MainCanvas.Children.Add(yAxis);
+            string qId; 
+            if (axis == "XAxis")
+            {
+                qId = XAxis.Uid;
+                Question ques = configData.FindQuestionFromId(qId);
+                //int numAnswers = ques.Answers.Length;
+                //double step = XAxisLength / numAnswers;
+                //for (int index = 0; index < numAnswers; index++)
+                //{
+                //    Line tick = new Line();
+                //    tick.Name = "XTick_"+ index;
+                //    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                //    tick.X1 = XAxis.X1 + index*step;
+                //    tick.Y1 = XAxis.Y1 - 10.00;
+                //    tick.X2 = XAxis.X1 + index * step;
+                //    tick.Y2 = XAxis.Y1 + 10.00;
+                //    //xAxis.HorizontalAlignment = HorizontalAlignment.Left;
+                //    //xAxis.VerticalAlignment = VerticalAlignment.Center;
+                //    tick.StrokeThickness = 1;
+                //    MainCanvas.Children.Add(tick);
+                //}
+            } 
+            else if (axis == "YAxis")
+            {
+                qId = YAxis.Uid;
+                Question ques = configData.FindQuestionFromId(qId);
+                
+            }
 
         }
 
+        /// <summary>
+        /// Logic for drawing X, Y axes labels.
+        /// </summary>
+        private void DrawAxesLabels(string xAxisLabel, string yAxisLabel)
+        { 
+            
+        }
 
         /// <summary>
         /// Logic for drawing data points.
@@ -134,6 +200,7 @@ namespace TangibleAnchoring
                     dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
                     dataPointEllipses[index].SetValue(Canvas.BottomProperty, bottomPosition);
                     dataPointEllipses[index].Name = "data_" + index;
+                    dataPointEllipses[index].Uid += index; 
                     
                     //Dynamic assignment of touch event handler
                     dataPointEllipses[index].TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
@@ -148,6 +215,14 @@ namespace TangibleAnchoring
             }
         }
 
+        private void setQuestion(string questionId)
+        {
+            //get the question questionText
+            string qText = configData.FindQuestionFromId(questionId).QuestionText;
+            CurrentQuestion.Content = qText;
+            CurrentQuestion.Uid = questionId;
+           // LogMsg(qText);
+        }
          /// <summary>
         /// Touch Event handler for dynamically added data point.
         /// </summary>
@@ -198,7 +273,7 @@ namespace TangibleAnchoring
             SolidColorBrush mySolidColorBrush = new SolidColorBrush();
 
             // Describes the brush's color using RGB values.  
-            // Each value has a range of 0-255.
+            // Each value has a facetRange of 0-255.
             mySolidColorBrush.Color = SurfaceColors.Accent2Color;
 
             //Used to change color of touched elements.
@@ -229,12 +304,12 @@ namespace TangibleAnchoring
         }
 
         /// <summary>
-        /// Update the text description with the most recent property values. Position
+        /// Update the questionText description with the most recent property values. Position
         /// the textbox so that it does not go offscreen (outside parentGrid). Also
         /// position the connecting line between the touch device and the textbox.
         /// </summary>
         /// <param name="parentGrid">the container for this diagram-
-        /// description text will not go outside of this container's bounds</param>
+        /// description questionText will not go outside of this container's bounds</param>
         /// <param name="touchDevice">the touch device to diagram</param>
         /// <param name="showTouchDeviceInfo">Whether or not the touch device info will be visible</param>
         private void UpdateDescription(Grid parentGrid, TouchDevice touchDevice, Submission submission, bool showTouchDeviceInfo)
@@ -256,7 +331,7 @@ namespace TangibleAnchoring
             bool isAbove = true;
             bool isLeft = true;
 
-            // Description text for tags is different than non-tags
+            // Description questionText for tags is different than non-tags
             double descriptionXDistance;
             bool isTag = touchDevice.GetIsTagRecognized();
 
@@ -302,13 +377,13 @@ namespace TangibleAnchoring
             // Create the description string.
             StringBuilder descriptionText = new StringBuilder();
             //Show demographic info for submission data
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Respondent id: {0}", submission.UserId));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Respondent questionId: {0}", submission.UserId));
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Age: {0}", submission.Age.ToString()));
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Location: {0}, {1}", submission.Latitude.ToString(), submission.Longitude.ToString()));
 
 
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "RecognizedTypes: {0}", GetTouchDeviceTypeString(touchDevice)));
-            //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Id: {0}", touchDevice.Id));
+            //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "QuestionId: {0}", touchDevice.QuestionId));
 
             //// Use the "f1" format specifier to limit the amount of decimal positions shown.
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "X: {0}", position.X.ToString("f1", CultureInfo.InvariantCulture)));
@@ -349,7 +424,7 @@ namespace TangibleAnchoring
                 x2 = finalBounds.Left;
             }
             // Position (X1,Y1) is the center of the touchDevice.
-            // Position (X2,Y2) is the edge of the description text box.
+            // Position (X2,Y2) is the edge of the description questionText box.
             ConnectingLine.X1 = position.X;
             ConnectingLine.Y1 = position.Y;
             ConnectingLine.X2 = x2;
@@ -400,7 +475,7 @@ namespace TangibleAnchoring
             int numPoints = dataPointEllipses.Length;
             for (int i = 0; i < numPoints; i++)
             {
-                int sIndex = int.Parse(dataPointEllipses[i].Name.Split('_')[1]);
+                int sIndex = int.Parse(dataPointEllipses[i].Uid);
                 tempSubmission = submissionData.Submissions[sIndex];
                 int numResponses = tempSubmission.Responses.Length;
                 for (int j = 0; j < numResponses; j++)

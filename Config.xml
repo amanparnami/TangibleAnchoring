@@ -9,29 +9,29 @@
       <TagId>4</TagId>
       <Name>Democrat</Name>
       <file>partyFilter_blue.svg</file>
-      <Color>29,113,184</Color>
+      <Color>29zx113zx184</Color>
       <selectorFile>partySelector_blue.svg</selectorFile>
       <Rotation>
         <Facet>
           <Type>single</Type>
           <Label>All Democrats</Label>
           <QuestionId>49</QuestionId>
-          <AnswerIds>1,2</AnswerIds>
-          <Color>29,113,184</Color>
+          <AnswerIds>1zx2</AnswerIds>
+          <Color>29zx113zx184</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Strong Democrat</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>1</AnswerIds>
-          <Color>29,113,184</Color>
+          <Color>29zx113zx184</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Democrat</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>2</AnswerIds>
-          <Color>29,113,184</Color>
+          <Color>29zx113zx184</Color>
         </Facet>
       </Rotation>
     </Tangible>
@@ -40,29 +40,29 @@
       <TagId>36</TagId>
       <Name>Republican</Name>
       <file>partyFilter_red.svg</file>
-      <Color>227,6,19</Color>
+      <Color>227zx6zx19</Color>
       <selectorFile>partySelector_red.svg</selectorFile>
       <Rotation>
         <Facet>
           <Type>single</Type>
           <Label>All Republicans</Label>
           <QuestionId>49</QuestionId>
-          <AnswerIds>6,7</AnswerIds>
-          <Color>227,6,1</Color>
+          <AnswerIds>6zx7</AnswerIds>
+          <Color>227zx6zx1</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Strong Republican</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>6</AnswerIds>
-          <Color>227,6,19</Color>
+          <Color>227zx6zx19</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <Label>Republican</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>7</AnswerIds>
-          <Color>227,6,1</Color>
+          <Color>227zx6zx1</Color>
         </Facet>
       </Rotation>
     </Tangible>
@@ -71,36 +71,36 @@
       <TagId>32</TagId>
       <Name>Inpdependent</Name>
       <file>partyFilter_yellow.svg</file>
-      <Color>255,237,0</Color>
+      <Color>255zx237zx0</Color>
       <selectorFile>partySelector_yellow.svg</selectorFile>
       <Rotation>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
-          <AnswerIds>3,4,5</AnswerIds>
+          <AnswerIds>3zx4zx5</AnswerIds>
           <Label>All Democrats</Label>
-          <Color>255,237,0</Color>
+          <Color>255zx237zx0</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
           <AnswerIds>3</AnswerIds>
           <Label>Ind - Lean Democrat</Label>
-          <Color>255,237,0</Color>
+          <Color>255zx237zx0</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
           <AnswerIds>4</AnswerIds>
           <Label>Independent</Label>
-          <Color>255,237,0</Color>
+          <Color>255zx237zx0</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
           <QuestionId>49</QuestionId>
           <AnswerIds>5</AnswerIds>
           <Label>Ind - Lean Republican</Label>
-          <Color>255,237,0</Color>+
+          <Color>255zx237zx0</Color>+
         </Facet>
       </Rotation>
     </Tangible>
@@ -116,34 +116,22 @@
           <Label>Income</Label>
           <Type>interval</Type>
           <QuestionId>46</QuestionId>
-          <AnswerIds>1,2,3,4,5,6,7,8</AnswerIds>
-          <Range>
-            <StartValue>1</StartValue>
-            <EndValue>8</EndValue>
-            <Increment>1</Increment>
-          </Range>
+          <AnswerIds>1zx2zx3zx4zx5zx6zx7zx8</AnswerIds>
+          <FacetRange>1zx8zx1</FacetRange>
         </Facet>
         <Facet>
           <Label>Occupation</Label>
           <Type>nominal</Type>
           <QuestionId>81</QuestionId>
-          <AnswerIds>1,2,3,4,5,6,7,8</AnswerIds>
-          <Range>
-            <StartValue>1</StartValue>
-            <EndValue>8</EndValue>
-            <Increment>1</Increment>
-          </Range>
+          <AnswerIds>1zx2zx3zx4zx5zx6zx7zx8</AnswerIds>
+          <FacetRange>1zx8zx1</FacetRange>
         </Facet>
         <Facet>
           <Label>Economy Better or Worse?</Label>
           <Type>nominal</Type>
           <QuestionId>47</QuestionId>
-          <AnswerIds>1,2,3,4</AnswerIds>
-          <Range>
-            <StartValue>1</StartValue>
-            <EndValue>4</EndValue>
-            <Increment>1</Increment>
-          </Range>
+          <AnswerIds>1zx2zx3zx4</AnswerIds>
+          <FacetRange>1zx4zx1</FacetRange>
         </Facet>
       </Rotation>
     </Tangible>
@@ -167,22 +155,14 @@
           <Label>Age</Label>
           <Type>ratio</Type>
           <QuestionId>4</QuestionId>
-          <Range>
-            <StartValue>0</StartValue>
-            <EndValue>100 </EndValue>
-            <Increment>1</Increment>
-          </Range>
+          <FacetRange>0zx100zx1</FacetRange>
         </Facet>
         <Facet>
           <Label>Obama or Romney</Label>
           <Type>nominal</Type>
           <QuestionId>5</QuestionId>
-          <AnswerIds>1,2,3,4,5,6,7</AnswerIds>
-          <Range>
-            <StartValue>1</StartValue>
-            <EndValue>7</EndValue>
-            <Increment>1</Increment>
-          </Range>
+          <AnswerIds>1zx2zx3zx4zx5zx6zx7</AnswerIds>
+          <FacetRange>1zx7zx1</FacetRange>
         </Facet>
       </Rotation>
     </Tangible>
@@ -223,7 +203,7 @@
       <file>0</file>
       <Color>0</Color>
       <selectorFile>0</selectorFile>
-      <Rotation>  
+      <Rotation>
         <Facet>
         </Facet>
       </Rotation>
@@ -263,6 +243,7 @@
           <AnswerText>Immigration</AnswerText>
         </Answer>
       </Answers>
+    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>48</QuestionId>
@@ -289,6 +270,7 @@
           <AnswerText>Not sure</AnswerText>
         </Answer>
       </Answers>
+    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>5</QuestionId>
@@ -323,6 +305,7 @@
           <AnswerText>Romney</AnswerText>
         </Answer>
       </Answers>
+    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>47</QuestionId>
@@ -345,6 +328,7 @@
           <AnswerText>Not Sure</AnswerText>
         </Answer>
       </Answers>
+    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>49</QuestionId>
@@ -379,6 +363,7 @@
           <AnswerText>Strong Republican</AnswerText>
         </Answer>
       </Answers>
+    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>46</QuestionId>
@@ -417,6 +402,7 @@
           <AnswerText>&gt; $100k</AnswerText>
         </Answer>
       </Answers>
+    <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>81</QuestionId>
@@ -455,13 +441,12 @@
           <AnswerText>Unemployed</AnswerText>
         </Answer>
       </Answers>
+      <Blah>0zx100zx1</Blah>
     </Question>
     <Question>
       <QuestionId>4</QuestionId>
       <QuestionText>AGE</QuestionText>
-      <Answers>
-        <Range>0-100</Range>
-      </Answers>
+      <Blah>0zx100zx1</Blah>
     </Question>
   </Questions>
 </Config>

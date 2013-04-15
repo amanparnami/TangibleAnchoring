@@ -31,7 +31,7 @@ namespace TangibleAnchoring.Config
             get { return questions; }
             set { questions = value; }
         }
-        
+
         public Config(string filePath)
         {
             XmlSerializationHelpers.Config xmlData = XmlSerializationHelpers.Config.Deserialize(filePath);
@@ -57,6 +57,30 @@ namespace TangibleAnchoring.Config
                     questions[index] = new Question(xmlData.Questions[index]);
                 }
             }
+        }
+
+        public Question FindQuestionFromId(string qId)
+        {
+            foreach (Question ques in questions)
+            {
+                if (ques.QuestionId == qId)
+                {
+                    return ques;
+                }
+            }
+            return null;
+        }
+
+        public Tangible FindTangibleFromId(string tId)
+        {
+            foreach (Tangible tang in tangibles)
+            {
+                if (tang.TagId == tId)
+                {
+                    return tang;
+                }
+            }
+            return null;
         }
     }
 }

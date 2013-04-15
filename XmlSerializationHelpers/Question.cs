@@ -9,29 +9,36 @@ namespace TangibleAnchoring.XmlSerializationHelpers
 {
     public class Question
     {
-        private string id;
+        private string questionId;
         [XmlElement]
-        public string Id
+        public string QuestionId
         {
-            get { return id; }
-            set { id = value; }
+            get { return questionId; }
+            set { questionId = value; }
         }
 
-        private string text;
+        private string questionText;
         [XmlElement]
-        public string Text
+        public string QuestionText
         {
-            get { return text; }
-            set { text = value; }
+            get { return questionText; }
+            set { questionText = value; }
         }
 
-        private Answer[] answers;
+        private string blah;
+        [XmlElement]
+        public string Blah
+        {
+            get { return blah; }
+            set { blah = value; }
+        }
+
+
+        //public ARange[] AnswerRange;
+
+        public Answer[] Answers;
         
-        public Answer[] Answers
-        {
-            get { return answers; }
-            set { answers = value; }
-        }
-
+        
+       
     }
 }

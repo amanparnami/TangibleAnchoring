@@ -7,18 +7,15 @@ using System.Xml.Serialization;
 
 namespace TangibleAnchoring.XmlSerializationHelpers
 {
-    public class Tangible
+    public class ARange
     {
         [XmlElement]
-        public string Type;
+        public string RStartValue;
 
         [XmlElement]
-        public string TagId;
+        public string REndValue;
 
         [XmlElement]
-        public string Name;
-
-        public Facet[] Rotation;
-
+        public string RIncrement;
     }
 }

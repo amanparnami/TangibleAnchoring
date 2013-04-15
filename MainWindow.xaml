@@ -2,12 +2,44 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:s="http://schemas.microsoft.com/surface/2008"
-        Title="MainWindow" WindowStyle="None" ResizeMode="NoResize" WindowState="Maximized" ShowInTaskbar="False">
-    <Grid x:Name="RootGrid">
+        Title="MainWindow" WindowStyle="None" ResizeMode="NoResize" WindowState="Maximized" ShowInTaskbar="False"
+                 Width="1920" Height="1080">
+    <Grid x:Name="RootGrid" Width="1920" Height="1080">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="72" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Label x:Name="LogMessageLabel" 
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.Accent4BrushKey}}"     
+               Grid.Row="0"
+               Grid.Column="0"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
+        <Label x:Name="CurrentQuestion" 
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 
+               FontSize="48"
+               Grid.Row="0"
+                Grid.Column="1"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
+        <Label x:Name="CurrentAnswer"  
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 
+               FontSize="32"
+               Content="All Answers"
+               VerticalAlignment="Center"
+               Grid.Row="0"
+               Grid.Column="2"/>
+        
         <s:TagVisualizer
             VisualizationAdded="OnTangibleAdded"
             VisualizationMoved="OnTangibleMoved"
-            VisualizationRemoved="OnTangibleRemoved">
+            VisualizationRemoved="OnTangibleRemoved"
+            Grid.RowSpan="2" Grid.ColumnSpan="3">
             <s:TagVisualizer.Definitions>
                 <s:TagVisualizationDefinition  
                                               Source="TangibleVisualization.xaml"
@@ -20,8 +52,48 @@
             </s:TagVisualizer.Definitions>
             <Canvas x:Name="MainCanvas">
 
-                <Label x:Name="LogMessageLabel" Foreground="{DynamicResource {x:Static s:SurfaceColors.Accent4BrushKey}}"     />
+                <!--Uid will contain the questionId corresponding to the parameter-->
+                <Line Name = "XAxis"
+                      Stroke = "DarkSlateGray"
+                      StrokeThickness="1"
+                      X1 = "120"
+            Y1 = "960"
+            X2 = "1900"
+            Y2 = "960" 
+             />
 
+                <Label x:Name="XAxisLabel" 
+                       Uid=""
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 
+               FontSize="24"
+               Content="XAxis"
+               Canvas.Left="900"
+               Canvas.Bottom="32"
+               />
+
+                <!--Uid will contain the questionId corresponding to the parameter-->
+                <Line Name = "YAxis"
+                      Uid=""
+                      Stroke = "DarkSlateGray"
+                      StrokeThickness="1"
+                      X1 = "120"
+            Y1 = "80"
+            X2 = "120"
+            Y2 = "960" />
+                
+                <Label x:Name="YAxisLabel" 
+                       Uid=""
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 
+               FontSize="24"
+               Content="YAxis"
+               Canvas.Left="32"
+               Canvas.Top="540" 
+              >
+                    <Label.RenderTransform>
+                        <RotateTransform Angle="-90" />
+                    </Label.RenderTransform>
+                </Label>
+                
                 <!-- This line is updated to connect the center of ellipse and the description textbox. -->
                 <Line x:Name="ConnectingLine" 
           Stroke="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 

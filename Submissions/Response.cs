@@ -16,7 +16,7 @@ namespace TangibleAnchoring.Submissions
         private readonly string mediaName;
 
         /// <summary>
-        /// Question Id to which response was made.
+        /// Question QuestionId to which response was made.
         /// </summary>
         public string QuestionId
         {
@@ -24,7 +24,7 @@ namespace TangibleAnchoring.Submissions
         }
 
         /// <summary>
-        /// Answer Id that corresponds to response.
+        /// Answer QuestionId that corresponds to response.
         /// </summary>
         public string AnswerId
         {

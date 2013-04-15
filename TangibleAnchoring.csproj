@@ -55,6 +55,7 @@
     <Compile Include="Config\Answer.cs" />
     <Compile Include="Config\Facet.cs" />
     <Compile Include="Config\Question.cs" />
+    <Compile Include="Config\ARange.cs" />
     <Compile Include="Config\Tangible.cs" />
     <Compile Include="Criteria.cs" />
     <Compile Include="TangibleVisualization.xaml.cs">
@@ -70,6 +71,7 @@
     <Compile Include="XmlSerializationHelpers\Config.cs" />
     <Compile Include="XmlSerializationHelpers\Facet.cs" />
     <Compile Include="XmlSerializationHelpers\Question.cs" />
+    <Compile Include="XmlSerializationHelpers\ARange.cs" />
     <Compile Include="XmlSerializationHelpers\Response.cs" />
     <Compile Include="XmlSerializationHelpers\Submission.cs" />
     <Compile Include="XmlSerializationHelpers\SubmissionData.cs" />

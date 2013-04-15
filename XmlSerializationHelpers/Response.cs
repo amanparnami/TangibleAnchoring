@@ -11,7 +11,7 @@ namespace TangibleAnchoring.XmlSerializationHelpers
     {
         private string questionId;
         /// <summary>
-        /// Question Id to which response was made.
+        /// Question QuestionId to which response was made.
         /// </summary>
         [XmlElement]
         public string QuestionId
@@ -22,7 +22,7 @@ namespace TangibleAnchoring.XmlSerializationHelpers
 
         private string answerId;
         /// <summary>
-        /// Answer Id that corresponds to response.
+        /// Answer QuestionId that corresponds to response.
         /// </summary>
         [XmlElement]
         public string AnswerId

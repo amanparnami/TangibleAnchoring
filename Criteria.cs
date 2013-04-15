@@ -27,7 +27,7 @@ namespace TangibleAnchoring
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="questionId">Question id to be checked</param>
+        /// <param name="questionId">Question questionId to be checked</param>
         /// <param name="csvAnswerIds">Comma separated answer ids</param>
         public Criteria(string questionId, string csvAnswerIds)
         {

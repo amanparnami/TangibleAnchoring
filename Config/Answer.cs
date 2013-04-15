@@ -8,26 +8,26 @@ namespace TangibleAnchoring.Config
 {
     public class Answer
     {
-        private string id;
+        private string answerId;
 
-        public string Id
+        public string AnswerId
         {
-            get { return id; }
-            set { id = value; }
+            get { return answerId; }
+            set { answerId = value; }
         }
 
-        private string text;
+        private string answerText;
 
-        public string Text
+        public string AnswerText
         {
-            get { return text; }
-            set { text = value; }
+            get { return answerText; }
+            set { answerText = value; }
         }
 
         public Answer(XmlSerializationHelpers.Answer xmlData)
         {
-            id = xmlData.Id;
-            text = xmlData.Text;
+            answerId = xmlData.AnswerId;
+            answerText = xmlData.AnswerText;
         }
     }
 }

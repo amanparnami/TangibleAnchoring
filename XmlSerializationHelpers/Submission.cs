@@ -11,7 +11,7 @@ namespace TangibleAnchoring.XmlSerializationHelpers
     {
         private string pollId;
         /// <summary>
-        /// Gets the poll id associated with the submission.
+        /// Gets the poll questionId associated with the submission.
         /// </summary>
         [XmlElement]
         public string PollId
@@ -22,7 +22,7 @@ namespace TangibleAnchoring.XmlSerializationHelpers
 
         private string userId;
         /// <summary>
-        /// Gets the user/respondent id associated with the submission.
+        /// Gets the user/respondent questionId associated with the submission.
         /// </summary>
         [XmlElement]
         public string UserId

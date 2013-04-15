@@ -8,21 +8,38 @@ namespace TangibleAnchoring.Config
 {
     public class Question
     {
-        private string id;
+        private string questionId;
 
-        public string Id
+        public string QuestionId
         {
-            get { return id; }
-            set { id = value; }
+            get { return questionId; }
+            set { questionId = value; }
         }
 
-        private string text;
+        private string questionText;
 
-        public string Text
+        public string QuestionText
         {
-            get { return text; }
-            set { text = value; }
+            get { return questionText; }
+            set { questionText = value; }
         }
+
+        //private ARange[] blah;
+
+        //public ARange[] AnswerRange
+        //{
+        //    get { return blah; }
+        //    set { blah = value; }
+        //}
+
+        private string blah;
+
+        public string Blah
+        {
+            get { return blah; }
+            set { blah = value; }
+        }
+
 
         private Answer[] answers;
 
@@ -32,10 +49,13 @@ namespace TangibleAnchoring.Config
             set { answers = value; }
         }
 
+        
+
         public Question(XmlSerializationHelpers.Question xmlData)
         {
-            id = xmlData.Id;
-            text = xmlData.Text;
+            questionId = xmlData.QuestionId;
+            questionText = xmlData.QuestionText;
+            blah = xmlData.Blah;
 
             if (xmlData.Answers != null)
             {
@@ -46,6 +66,17 @@ namespace TangibleAnchoring.Config
                     answers[index] = new Answer(xmlData.Answers[index]);
                 }
             }
+
+
+            //if (xmlData.AnswerRange != null)
+            //{
+            //    int numRange = xmlData.AnswerRange.Length;
+            //    blah = new ARange[numRange];
+            //    for (int index = 0; index < numRange; index++)
+            //    {
+            //        blah[index] = new ARange(xmlData.AnswerRange[index]);
+            //    }
+            //}
         }
     }
 }
