@@ -71,6 +71,24 @@ namespace TangibleAnchoring.Config
             return null;
         }
 
+        public Answer FindAnswerFromQuesIdAnsId(string qId, string aId)
+        {
+            foreach (Question ques in questions)
+            {
+                if (ques.QuestionId == qId)
+                {
+                    foreach (Answer ans in ques.Answers)
+                    {
+                        if (ans.AnswerId == aId)
+                        {
+                            return ans;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
         public Tangible FindTangibleFromId(string tId)
         {
             foreach (Tangible tang in tangibles)

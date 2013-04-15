@@ -28,14 +28,14 @@ namespace TangibleAnchoring
 
         //WA = Work Area
 
-        private double WAWidth = System.Windows.SystemParameters.WorkArea.Width;
-        private double WAHeight = System.Windows.SystemParameters.WorkArea.Height;
-        double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
-        double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
-        private double leftMargin = 100;
-        private double bottomMargin = 50;
-        private double rightMargin = 50;
-        private double topMargin = 50;
+        //private double WAWidth = System.Windows.SystemParameters.WorkArea.Width;
+        //private double WAHeight = System.Windows.SystemParameters.WorkArea.Height;
+        //double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
+        //double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
+        //private double leftMargin = 100;
+        //private double bottomMargin = 50;
+        //private double rightMargin = 50;
+        //private double topMargin = 50;
         private double YAxisLength;
         private double XAxisLength;
         
@@ -57,30 +57,32 @@ namespace TangibleAnchoring
             submissionData = new Submissions.SubmissionData(configData.SubmissionsFileUri);
             dataPointEllipses = new Ellipse[submissionData.Submissions.Length];
 
-            LogMsg(configData.Questions.Length.ToString());
-
-            setQuestion("49");
-
-            // Initialize the XAxis
-            XAxisLabel.Content = configData.FindQuestionFromId("81").QuestionText;
-            XAxisLabel.Uid = "81";
-            XAxis.Uid = "81";
-
-            // Initialize the YAxis
-            YAxisLabel.Content = configData.FindQuestionFromId("4").QuestionText;
-            YAxisLabel.Uid = "4";
-            YAxis.Uid = "4";
-
             YAxisLength = YAxis.Y2 - YAxis.Y1;
             XAxisLength = XAxis.X2 - XAxis.X1;
+
+            InitScatterplot("48", "All Answers", "46", "4");
+            
+            //Criteria criteria = new Criteria("49","1,2");
+            //VizOperationFilter(criteria); 
+        }
+
+
+        private void InitScatterplot(string quesId, string ansId, string xAxisQuesId, string yAxisQuesid)
+        {
+            setQuestion(quesId);
+            // Initialize the XAxis
+            XAxisLabel.Content = configData.FindQuestionFromId(xAxisQuesId).QuestionText;
+            XAxisLabel.Uid = xAxisQuesId;
+            XAxis.Uid = xAxisQuesId;
+
+            // Initialize the YAxis
+            YAxisLabel.Content = configData.FindQuestionFromId(yAxisQuesid).QuestionText;
+            YAxisLabel.Uid = yAxisQuesid;
+            YAxis.Uid = yAxisQuesid;
 
             DrawPoints(submissionData);
             DrawTicks("XAxis");
             DrawTicks("YAxis");
-            //LogMsg(configData.FindQuestionFromId("4").AnswerRange);
-            
-            //Criteria criteria = new Criteria("49","1,2");
-            //VizOperationFilter(criteria); 
         }
 
         /// <summary>
@@ -92,38 +94,6 @@ namespace TangibleAnchoring
             LogMessageLabel.Content = message;
         }
 
-        /// <summary>
-        /// Logic for drawing X, Y axes.
-        /// </summary>
-        //private void DrawAxes()
-        //{
-
-        //    string message = "WA: W= " + screenWidth + " H= " + screenHeight;
-        //    LogMsg(message);
-        //    Line xAxis = new Line(), yAxis = new Line();
-        //    //xAxis.Name = "XAxis";
-        //    //xAxis.Stroke = System.Windows.Media.Brushes.Beige;
-        //    //xAxis.X1 = leftMargin / 2;
-        //    //xAxis.Y1 = WAHeight - bottomMargin / 2;
-        //    //xAxis.X2 = WAWidth - rightMargin;
-        //    //xAxis.Y2 = xAxis.Y1;
-        //    ////xAxis.HorizontalAlignment = HorizontalAlignment.Left;
-        //    ////xAxis.VerticalAlignment = VerticalAlignment.Center;
-        //    //xAxis.StrokeThickness = 1;
-        //    //MainCanvas.Children.Add(xAxis);
-
-        //    //yAxis.Stroke = System.Windows.Media.Brushes.Beige;
-        //    //xAxis.Name = "YAxis";
-        //    //yAxis.X1 = leftMargin / 2;
-        //    //yAxis.Y1 = WAHeight - bottomMargin / 2;
-        //    //yAxis.X2 = yAxis.X1;
-        //    //yAxis.Y2 = bottomMargin + topMargin;
-        //    ////yAxis.HorizontalAlignment = HorizontalAlignment.Left;
-        //    ////yAxis.VerticalAlignment = VerticalAlignment.Center;
-        //    //yAxis.StrokeThickness = 1;
-        //    //MainCanvas.Children.Add(yAxis);
-
-        //}
 
         private void DrawTicks(string axis)
         {
@@ -291,15 +261,25 @@ namespace TangibleAnchoring
                 int numPoints = submissionData.Submissions.Length;
                 Random r = new Random();
 
+                //SolidColorBrush[] viewpointColors = {
+                //                           SurfaceColors.Accent1Brush,
+                //                           SurfaceColors.Accent2Brush, 
+                //                           SurfaceColors.Accent3Brush, 
+                //                           SurfaceColors.Accent4Brush,
+                //                           SurfaceColors.BulletBrush, 
+                //                           SurfaceColors.ButtonBackgroundBrush, 
+                //                           SurfaceColors.ButtonBackgroundPressedBrush
+                //                       };
+
                 SolidColorBrush[] viewpointColors = {
-                                           SurfaceColors.Accent1Brush,
-                                           SurfaceColors.Accent2Brush, 
-                                           SurfaceColors.Accent3Brush, 
-                                           SurfaceColors.Accent4Brush,
-                                           SurfaceColors.BulletBrush, 
-                                           SurfaceColors.ButtonBackgroundBrush, 
-                                           SurfaceColors.ButtonBackgroundPressedBrush
-                                       };
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#36ACAA")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFED00")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#F29620")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#E30613")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#E30613"))
+                                                    };
 
                 for (int index = 0; index < numPoints; index++)
                 {
@@ -313,7 +293,8 @@ namespace TangibleAnchoring
                     //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
                     int tickInterval = (int) XAxisLength / rangeXAxis;
                     double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
-                    /******** Calculation for bottomPosition ********/
+
+                    /******** Calculation for topPosition ********/
                     //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
                     //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
                     //ASSUMPTION Hard coding the YAxis vairable to be Age
@@ -340,34 +321,35 @@ namespace TangibleAnchoring
 
                     // AnswerId - 1 because viewpoints are numbered from 1..7 
                     dataPointEllipses[index].Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
+                    dataPointEllipses[index].Opacity = 0.6;
                     MainCanvas.Children.Add(dataPointEllipses[index]);
                 }
             }
         }
 
-        private Line getTickFromId(string axis, string answerId)
-        {
-            Line newTick = new Line();
-            switch (axis)
-            {
-                case "xaxis":
-                    LogMsg("Answerid: "+answerId);
-                    if (MainCanvas.FindName("XTick_2") != null)
-                    {
-                        newTick = (Line) MainCanvas.FindName("XTick_" + answerId);
-                    }
-                    break;
-                case "yaxis":
-                    //This is needed only if the variable is not a range otherwise a direct calculation of x, y is required
-                    //newTick = (Line)MainCanvas.FindName("YTick_" + answerId);
-                    break;
-                default:
-                    break;
-            }
+        //private Line getTickFromId(string axis, string answerId)
+        //{
+        //    Line newTick = new Line();
+        //    switch (axis)
+        //    {
+        //        case "xaxis":
+        //            LogMsg("Answerid: "+answerId);
+        //            if (MainCanvas.FindName("XTick_2") != null)
+        //            {
+        //                newTick = (Line) MainCanvas.FindName("XTick_" + answerId);
+        //            }
+        //            break;
+        //        case "yaxis":
+        //            //This is needed only if the variable is not a range otherwise a direct calculation of x, y is required
+        //            //newTick = (Line)MainCanvas.FindName("YTick_" + answerId);
+        //            break;
+        //        default:
+        //            break;
+        //    }
             
             
-            return newTick;
-        }
+        //    return newTick;
+        //}
 
         private void setQuestion(string questionId)
         {
@@ -375,8 +357,12 @@ namespace TangibleAnchoring
             string qText = configData.FindQuestionFromId(questionId).QuestionText;
             CurrentQuestion.Content = qText;
             CurrentQuestion.Uid = questionId;
+
+            //Re-initialize the current answer to All Answers
+            CurrentAnswer.Content = "All Answers";
            // LogMsg(qText);
         }
+
          /// <summary>
         /// Touch Event handler for dynamically added data point.
         /// </summary>
@@ -400,7 +386,7 @@ namespace TangibleAnchoring
             Ellipse senderEllipse = sender as Ellipse;
             
             haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width/4);
-            haloEllipse.SetValue(Canvas.BottomProperty, Canvas.GetBottom(senderEllipse) - senderEllipse.Height/4);
+            haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height/4);
             haloEllipse.Height = 30;
             haloEllipse.Width = 30;
             haloEllipse.Stroke = SurfaceColors.BulletBrush;
@@ -538,6 +524,8 @@ namespace TangibleAnchoring
 
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, XAxisLabel.Content +": {0}", configData.FindQuestionFromId(XAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(XAxis.Uid).AnswerId)-1].AnswerText));
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, YAxisLabel.Content +": {0}", submission.Age.ToString()));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Affiliation: {0}", configData.FindAnswerFromQuesIdAnsId("49", submission.FindResponseFromQuestionId("49").AnswerId).AnswerText));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Response: {0}", configData.FindAnswerFromQuesIdAnsId(CurrentQuestion.Uid, submission.FindResponseFromQuestionId(CurrentQuestion.Uid).AnswerId).AnswerText));
 
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "RecognizedTypes: {0}", GetTouchDeviceTypeString(touchDevice)));
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "QuestionId: {0}", touchDevice.QuestionId));
@@ -786,12 +774,12 @@ namespace TangibleAnchoring
             }
             else if (orientation > 120.0 && orientation <= 240.00)
             {
-                criteria = new Criteria("49", "3,4");
+                criteria = new Criteria("49", "3,4,5");
                 VizOperationFilter(criteria);
             }
             else if (orientation > 240.0 && orientation < 360.00)
             {
-                criteria = new Criteria("49", "5,6");
+                criteria = new Criteria("49", "6,7");
                 VizOperationFilter(criteria);
             }
 
