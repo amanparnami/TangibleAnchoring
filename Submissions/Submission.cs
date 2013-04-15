@@ -69,5 +69,17 @@ namespace TangibleAnchoring.Submissions
             }
             
         }
+
+        public Response FindResponseFromQuestionId(string qId)
+        {
+            foreach (Response resp in responses)
+            {
+                if (resp.QuestionId == qId)
+                {
+                    return resp;
+                }
+            }
+            return null;
+        }
     }
 }

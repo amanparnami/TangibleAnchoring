@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Text;
 using Microsoft.Surface;
@@ -64,9 +62,9 @@ namespace TangibleAnchoring
             setQuestion("49");
 
             // Initialize the XAxis
-            XAxisLabel.Content = configData.FindQuestionFromId("46").QuestionText;
-            XAxisLabel.Uid = "46";
-            XAxis.Uid = "46";
+            XAxisLabel.Content = configData.FindQuestionFromId("81").QuestionText;
+            XAxisLabel.Uid = "81";
+            XAxis.Uid = "81";
 
             // Initialize the YAxis
             YAxisLabel.Content = configData.FindQuestionFromId("4").QuestionText;
@@ -79,7 +77,7 @@ namespace TangibleAnchoring
             DrawPoints(submissionData);
             DrawTicks("XAxis");
             DrawTicks("YAxis");
-            LogMsg(configData.FindQuestionFromId("4").AnswerRange);
+            //LogMsg(configData.FindQuestionFromId("4").AnswerRange);
             
             //Criteria criteria = new Criteria("49","1,2");
             //VizOperationFilter(criteria); 
@@ -129,6 +127,7 @@ namespace TangibleAnchoring
 
         private void DrawTicks(string axis)
         {
+            //TODO Clear previous ticks
             string qId;
             SolidColorBrush tickLabelColorBrush = new SolidColorBrush();
             tickLabelColorBrush.Color = SurfaceColors.ControlBorderColor;
@@ -151,7 +150,9 @@ namespace TangibleAnchoring
                     tick.X2 = tick.X1;
                     tick.Y2 = XAxis.Y1 + 10.00;
                     tick.StrokeThickness = 1;
+                    MainCanvas.RegisterName(tick.Name, tick);
                     MainCanvas.Children.Add(tick);
+                    
 
                     Label tLabel = new Label();
                     tLabel.Name = "XTickLabel_" + index;
@@ -160,7 +161,9 @@ namespace TangibleAnchoring
                     tLabel.Content = ques.Answers[index].AnswerText;
                     tLabel.SetValue(Canvas.LeftProperty, tick.X1 + step / 2 - (tLabel.Content.ToString().Length * (tLabel.FontSize * 0.75))/2);
                     tLabel.SetValue(Canvas.TopProperty, tick.Y1 + 20);
+                    MainCanvas.RegisterName(tLabel.Name, tLabel);
                     MainCanvas.Children.Add(tLabel);
+                    
                 }
             } 
             else if (axis == "YAxis")
@@ -181,7 +184,9 @@ namespace TangibleAnchoring
                         tick.X2 = YAxis.X1 + 10.00;
                         tick.Y2 = tick.Y1;
                         tick.StrokeThickness = 1;
+                        MainCanvas.RegisterName(tick.Name, tick);
                         MainCanvas.Children.Add(tick);
+                        
 
                         Label tLabel = new Label();
                         tLabel.Name = "YTickLabel_" + index;
@@ -190,7 +195,10 @@ namespace TangibleAnchoring
                         tLabel.Content = ques.Answers[index].AnswerText;
                         tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
                         tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                        MainCanvas.RegisterName(tLabel.Name, tLabel);
                         MainCanvas.Children.Add(tLabel);
+
+                        
                     }
                 } else if (ques.AnswerRange != null)
                 {
@@ -215,6 +223,7 @@ namespace TangibleAnchoring
                             tick.Y2 = tick.Y1;
                             tick.StrokeThickness = 1;
                             MainCanvas.Children.Add(tick);
+                            MainCanvas.RegisterName(tick.Name, tick);
 
                             Label tLabel = new Label();
                             tLabel.Name = "YTickLabel_" + index;
@@ -224,6 +233,7 @@ namespace TangibleAnchoring
                             tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
                             tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
                             MainCanvas.Children.Add(tLabel);
+                            MainCanvas.RegisterName(tLabel.Name, tLabel);
                         }
                     }
                     else if (range > 10)
@@ -241,6 +251,7 @@ namespace TangibleAnchoring
                             tick.Y2 = tick.Y1;
                             tick.StrokeThickness = 1;
                             MainCanvas.Children.Add(tick);
+                            MainCanvas.RegisterName(tick.Name, tick);
 
                             Label tLabel = new Label();
                             tLabel.Name = "YTickLabel_" + index;
@@ -250,13 +261,15 @@ namespace TangibleAnchoring
                             tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
                             tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
                             MainCanvas.Children.Add(tLabel);
-
+                            MainCanvas.RegisterName(tLabel.Name, tLabel);
                         }
                     }
                 }
             }
 
         }
+
+       
 
         /// <summary>
         /// Logic for drawing X, Y axes labels.
@@ -267,7 +280,8 @@ namespace TangibleAnchoring
         }
 
         /// <summary>
-        /// Logic for drawing data points.
+        /// Logic for drawing data points. It is dependant on current 
+        /// question, current answer and the two axes.
         /// </summary>
         /// <param name="submissionData">collection of points</param>
         private void DrawPoints(Submissions.SubmissionData submissionData)
@@ -275,7 +289,7 @@ namespace TangibleAnchoring
             if (submissionData != null)
             {
                 int numPoints = submissionData.Submissions.Length;
-
+                Random r = new Random();
 
                 SolidColorBrush[] viewpointColors = {
                                            SurfaceColors.Accent1Brush,
@@ -292,10 +306,29 @@ namespace TangibleAnchoring
                     dataPointEllipses[index] = new Ellipse();
                     Submissions.Submission sData = submissionData.Submissions[index];
                     //TODO replace 700 by minimum value for the variable
-                    double leftPosition = (double)(((int.Parse(sData.UserId) - 700) * 2) % WAWidth);
-                    double bottomPosition = (double)(((sData.Age) * 10) % WAHeight);
+                    //double leftPosition = (double)(((int.Parse(sData.UserId) - 700) * 2) % WAWidth);
+                    //double bottomPosition = (double)(((sData.Age) * 10) % WAHeight);
+                    string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
+                    int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
+                    //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                    int tickInterval = (int) XAxisLength / rangeXAxis;
+                    double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
+                    /******** Calculation for bottomPosition ********/
+                    //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
+                    //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
+                    //ASSUMPTION Hard coding the YAxis vairable to be Age
+                    string quesIdForYAxis = YAxis.Uid;
+                    string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
+                    double rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
+                    //For general case use the answerId found in next statement to find the x,y position
+                    //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                    //For Age, get direct value of age from sData
+                    int answerValue = sData.Age;
+
+                    //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                    double topPosition = YAxis.Y2 - (double) answerValue * (YAxisLength / rangeYAxis) - 10;
                     dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
-                    dataPointEllipses[index].SetValue(Canvas.BottomProperty, bottomPosition);
+                    dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
                     dataPointEllipses[index].Name = "data_" + index;
                     dataPointEllipses[index].Uid += index; 
                     
@@ -310,6 +343,30 @@ namespace TangibleAnchoring
                     MainCanvas.Children.Add(dataPointEllipses[index]);
                 }
             }
+        }
+
+        private Line getTickFromId(string axis, string answerId)
+        {
+            Line newTick = new Line();
+            switch (axis)
+            {
+                case "xaxis":
+                    LogMsg("Answerid: "+answerId);
+                    if (MainCanvas.FindName("XTick_2") != null)
+                    {
+                        newTick = (Line) MainCanvas.FindName("XTick_" + answerId);
+                    }
+                    break;
+                case "yaxis":
+                    //This is needed only if the variable is not a range otherwise a direct calculation of x, y is required
+                    //newTick = (Line)MainCanvas.FindName("YTick_" + answerId);
+                    break;
+                default:
+                    break;
+            }
+            
+            
+            return newTick;
         }
 
         private void setQuestion(string questionId)
@@ -474,10 +531,13 @@ namespace TangibleAnchoring
             // Create the description string.
             StringBuilder descriptionText = new StringBuilder();
             //Show demographic info for submission data
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Respondent questionId: {0}", submission.UserId));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Age: {0}", submission.Age.ToString()));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Location: {0}, {1}", submission.Latitude.ToString(), submission.Longitude.ToString()));
+            //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Respondent questionId: {0}", submission.UserId));
+            //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Age: {0}", submission.Age.ToString()));
+            //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Location: {0}, {1}", submission.Latitude.ToString(), submission.Longitude.ToString()));
+            //TODO Make the text dynamic as per axis or static based on what susan needs
 
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, XAxisLabel.Content +": {0}", configData.FindQuestionFromId(XAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(XAxis.Uid).AnswerId)-1].AnswerText));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, YAxisLabel.Content +": {0}", submission.Age.ToString()));
 
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "RecognizedTypes: {0}", GetTouchDeviceTypeString(touchDevice)));
             //descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "QuestionId: {0}", touchDevice.QuestionId));
