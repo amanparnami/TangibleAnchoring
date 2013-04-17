@@ -6,7 +6,7 @@
   <Tangibles>
     <Tangible>
       <Type>viewpoint</Type>
-      <TagId>4</TagId>
+      <TagId>212</TagId>
       <Name>Democrat</Name>
       <file>partyFilter_blue.svg</file>
       <Color>29,113,184</Color>
@@ -37,7 +37,7 @@
     </Tangible>
     <Tangible>
       <Type>viewpoint</Type>
-      <TagId>36</TagId>
+      <TagId>222</TagId>
       <Name>Republican</Name>
       <file>partyFilter_red.svg</file>
       <Color>227,6,19</Color>
@@ -68,8 +68,8 @@
     </Tangible>
     <Tangible>
       <Type>viewpoint</Type>
-      <TagId>32</TagId>
-      <Name>Inpdependent</Name>
+      <TagId>210</TagId>
+      <Name>Independent</Name>
       <file>partyFilter_yellow.svg</file>
       <Color>255,237,0</Color>
       <selectorFile>partySelector_yellow.svg</selectorFile>
@@ -106,7 +106,7 @@
     </Tangible>
     <Tangible>
       <Type>axisStart</Type>
-      <TagId>2</TagId>
+      <TagId>214</TagId>
       <Name>xAxisStart</Name>
       <file>0</file>
       <Color>0</Color>
@@ -137,7 +137,7 @@
     </Tangible>
     <Tangible>
       <Type>axisEnd</Type>
-      <TagId>46</TagId>
+      <TagId>209</TagId>
       <Name>xAxisEnd</Name>
       <file>0</file>
       <Color>0</Color>
@@ -145,7 +145,7 @@
     </Tangible>
     <Tangible>
       <Type>axisStart</Type>
-      <TagId>8</TagId>
+      <TagId>211</TagId>
       <Name>yAxisStart</Name>
       <file>0</file>
       <Color>0</Color>
@@ -169,7 +169,7 @@
     </Tangible>
     <Tangible>
       <Type>axisEnd</Type>
-      <TagId>42</TagId>
+      <TagId>215</TagId>
       <Name>yAxisEnd</Name>
       <file>0</file>
       <Color>0</Color>
@@ -177,7 +177,7 @@
     </Tangible>
     <Tangible>
       <Type>questionChanger</Type>
-      <TagId>100</TagId>
+      <TagId>208</TagId>
       <Name>Q?</Name>
       <file>0</file>
       <Color>0</Color>
@@ -199,7 +199,7 @@
     </Tangible>
     <Tangible>
       <Type>answerChanger</Type>
-      <TagId>200</TagId>
+      <TagId>213</TagId>
       <Name>A's</Name>
       <file>0</file>
       <Color>0</Color>
@@ -211,7 +211,7 @@
     </Tangible>
     <Tangible>
       <Type>tagger</Type>
-      <TagId>300</TagId>
+      <TagId>223</TagId>
       <Name>tag&amp;compare</Name>
       <file>0</file>
       <Color>0</Color>
@@ -247,7 +247,7 @@
     </Question>
     <Question>
       <QuestionId>48</QuestionId>
-      <QuestionText>Boost Economy or Reduce Deficity?</QuestionText>
+      <QuestionText>Boost Economy or Reduce Deficit?</QuestionText>
       <Answers>
         <Answer>
           <AnswerId>1</AnswerId>

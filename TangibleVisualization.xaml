@@ -3,23 +3,31 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:s="http://schemas.microsoft.com/surface/2008"
     Height="400" Width="400">
-    <Grid>
-        <Ellipse Stroke="Aqua"
+    <Canvas>
+        <Polygon
+            x:Name="myArrow"
+            Points="0,0 0,36 36,18 0,0"
+           Stroke="Aqua"
+             StrokeThickness="5"
+             Fill="{x:Null}"
+             Width="36"
+             Height="36" 
+            Margin="290,182,74,182"></Polygon>
+        <Ellipse Stroke="Chocolate"
              StrokeThickness="21"
              Fill="{x:Null}"
              x:Name="myEllipse"
              VerticalAlignment="Stretch"
              HorizontalAlignment="Stretch"
-             Width="192"
-             Height="192"
-             Grid.ColumnSpan="1"             
-             Grid.RowSpan="1"
-             Grid.Column="1"
-             Grid.Row="1" />
-        <Label Name="CameraModel" 
+             Width="200"
+             Height="200" Canvas.Left="103" Canvas.Top="100"
+              
+             />
+        <Label Name="TangibleInfo" 
                Content="Model" 
-               HorizontalAlignment="Center" 
-               VerticalAlignment="Center"/>
+               Foreground="DarkGray"
+               HorizontalContentAlignment="Center"
+               VerticalAlignment="Center" Canvas.Left="181" Canvas.Top="74"/>
 
-    </Grid>
+    </Canvas>
 </s:TagVisualization>

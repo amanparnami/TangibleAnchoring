@@ -722,35 +722,40 @@ namespace TangibleAnchoring
         /// <param name="e">Event object containing information about tagvisualization</param>
         private void OnTangibleAdded(object sender, TagVisualizerEventArgs e)
         {
-            TangibleVisualization camera = (TangibleVisualization)e.TagVisualization;
-            camera.CameraModel.Content = camera.Orientation;
-            camera.myEllipse.Fill = SurfaceColors.Accent1Brush;
-            Criteria criteria = new Criteria("49", "1,2");
+            TangibleVisualization tangibleViz = (TangibleVisualization)e.TagVisualization;
+            Criteria criteria = new Criteria("49", "");
+            switch (tangibleViz.VisualizedTag.Value)
+            {
+                case 222: //Viewpoint Republican
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
+                    //criteria.AnswerIds = configData.FindTangibleFromId("222").Rotation[0].AnswerIds.Split(',');
+                    
+                    break;
+                case 210: //Viewpoint Independent
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
+                    //criteria.AnswerIds = configData.FindTangibleFromId("210").Rotation[0].AnswerIds.Split(',');
+                    break;
+                case 212: //Viewpoint Democrat
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
+                    //criteria.AnswerIds = configData.FindTangibleFromId("212").Rotation[0].AnswerIds.Split(',');
+                    break;
+                case 208: //Question Changer
+                    break;
+                case 213: //Answer Changer
+                    break;
+                case 214: //XAxisStarter
+                    break;
+                case 209: //XAxisEnd
+                    break;
+                case 211: //YAxisStarter
+                    break;
+                case 215: //YAxisEnd
+                    break;
+                case 223: //Tagger
+                    break;
+            }
+            
             VizOperationFilter(criteria);
-            //TangibleVisualization camera = (TangibleVisualization)e.TagVisualization;
-            //switch (camera.VisualizedTag.Value)
-            //{
-            //    case 193:
-            //        camera.CameraModel.Content = "Fabrikam, Inc. ABC-12";
-            //        camera.myEllipse.Fill = SurfaceColors.Accent1Brush;
-            //        break;
-            //    case 2:
-            //        camera.CameraModel.Content = "Fabrikam, Inc. DEF-34";
-            //        camera.myEllipse.Fill = SurfaceColors.Accent2Brush;
-            //        break;
-            //    case 3:
-            //        camera.CameraModel.Content = "Fabrikam, Inc. GHI-56";
-            //        camera.myEllipse.Fill = SurfaceColors.Accent3Brush;
-            //        break;
-            //    case 4:
-            //        camera.CameraModel.Content = "Fabrikam, Inc. JKL-78";
-            //        camera.myEllipse.Fill = SurfaceColors.Accent4Brush;
-            //        break;
-            //    default:
-            //        camera.CameraModel.Content = "UNKNOWN MODEL";
-            //        camera.myEllipse.Fill = SurfaceColors.ControlAccentBrush;
-            //        break;
-            //}
         }
 
         /// <summary>
@@ -760,28 +765,58 @@ namespace TangibleAnchoring
         /// <param name="e">Event object containing information about tagvisualization</param>
         private void OnTangibleMoved(object sender, TagVisualizerEventArgs e)
         {
-            TangibleVisualization camera = (TangibleVisualization)e.TagVisualization;
-            double orientation = camera.Orientation;
-            camera.CameraModel.Content = orientation;
-            Criteria criteria;
-            VizOperationReset();
+            TangibleVisualization tangibleViz = (TangibleVisualization)e.TagVisualization;
+            double tOrientation = tangibleViz.Orientation, tX, tY;
+            RotateTransform myRotateTransform = new RotateTransform();
+            myRotateTransform.Angle = tOrientation;
+            tX = tangibleViz.Center.X;
+            tY = tangibleViz.Center.Y;
 
-            //TODO Code below is a POC of how a rotation tangible would work. Modify to make it react differently to different types of tangibles.
-            if (orientation > 0.0 && orientation <= 120.00)
+            VizOperationReset();
+            Criteria criteria;
+            switch (tangibleViz.VisualizedTag.Value)
             {
-                criteria = new Criteria("49", "1,2");
-                VizOperationFilter(criteria);
+                case 222: //Viewpoint Republican
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
+                    tangibleViz.TangibleInfo.Content = tX + " "+tY;
+                    //TODO Code below is a POC of how a rotation tangible would work. Modify to make it react differently to different types of tangibles.
+                    if (tOrientation > 0.0 && tOrientation <= 180.00)
+                    {
+                        criteria = new Criteria("49", "6");
+                        VizOperationFilter(criteria);
+                    }
+                    else if (tOrientation > 180.0 && tOrientation <= 360.00)
+                    {
+                        criteria = new Criteria("49", "7");
+                        VizOperationFilter(criteria);
+                    }
+                    break;
+                case 210: //Viewpoint Independent
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
+                    break;
+                case 212: //Viewpoint Democrat
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
+                    break;
+                case 208: //Question Changer
+                    break;
+                case 213: //Answer Changer
+                    break;
+                case 214: //XAxisStarter
+                    break;
+                case 209: //XAxisEnd
+                    break;
+                case 211: //YAxisStarter
+                    break;
+                case 215: //YAxisEnd
+                    break;
+                case 223: //Tagger
+                    break;
             }
-            else if (orientation > 120.0 && orientation <= 240.00)
-            {
-                criteria = new Criteria("49", "3,4,5");
-                VizOperationFilter(criteria);
-            }
-            else if (orientation > 240.0 && orientation < 360.00)
-            {
-                criteria = new Criteria("49", "6,7");
-                VizOperationFilter(criteria);
-            }
+
+            
+            
+
+ 
 
         }
 
@@ -796,6 +831,35 @@ namespace TangibleAnchoring
         {
             //TODO: Replace next line with a better function that only undoes the effect of the tangible that was just removed and not resets everything.
             VizOperationReset();
+
+            TangibleVisualization tangibleViz = (TangibleVisualization)e.TagVisualization;
+
+            switch (tangibleViz.VisualizedTag.Value)
+            {
+                case 222: //Viewpoint Republican
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
+                    break;
+                case 210: //Viewpoint Independent
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
+                    break;
+                case 212: //Viewpoint Democrat
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
+                    break;
+                case 208: //Question Changer
+                    break;
+                case 213: //Answer Changer
+                    break;
+                case 214: //XAxisStarter
+                    break;
+                case 209: //XAxisEnd
+                    break;
+                case 211: //YAxisStarter
+                    break;
+                case 215: //YAxisEnd
+                    break;
+                case 223: //Tagger
+                    break;
+            }
         }
     }
 }

@@ -36,18 +36,22 @@
                Grid.Column="2"/>
         
         <s:TagVisualizer
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
             VisualizationAdded="OnTangibleAdded"
             VisualizationMoved="OnTangibleMoved"
             VisualizationRemoved="OnTangibleRemoved"
-            Grid.RowSpan="2" Grid.ColumnSpan="3">
+            Grid.RowSpan="2" Grid.ColumnSpan="3"
+            Name="TATagVisualizer">
             <s:TagVisualizer.Definitions>
                 <s:TagVisualizationDefinition  
                                               Source="TangibleVisualization.xaml"
-                                              LostTagTimeout="1000"
-                                              MaxCount="2"
+                                              LostTagTimeout="2000"
+                                              MaxCount="10"
                                               OrientationOffsetFromTag="0"
                                               TagRemovedBehavior="Fade"
                                               UsesTagOrientation="True"
+                                              
                                               />
             </s:TagVisualizer.Definitions>
             <Canvas x:Name="MainCanvas">
