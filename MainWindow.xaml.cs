@@ -12,6 +12,7 @@ using Microsoft.Surface.Presentation.Input;
 using System.Globalization;
 using TangibleAnchoring.Submissions;
 using TangibleAnchoring.Config;
+using System.Collections.Generic;
 
 namespace TangibleAnchoring
 {
@@ -24,8 +25,18 @@ namespace TangibleAnchoring
         private readonly Config.Config configData;
         private readonly Submissions.SubmissionData submissionData;
         private Ellipse[] dataPointEllipses;
+        private Criteria filterCriteria = new Criteria("49","All Answers");
         Ellipse haloEllipse = new Ellipse();
 
+        SolidColorBrush[] viewpointColors = {
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#36ACAA")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFED00")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#F29620")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#E30613")),
+                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#E30613"))
+                                                    };
         //WA = Work Area
 
         //private double WAWidth = System.Windows.SystemParameters.WorkArea.Width;
@@ -60,10 +71,7 @@ namespace TangibleAnchoring
             YAxisLength = YAxis.Y2 - YAxis.Y1;
             XAxisLength = XAxis.X2 - XAxis.X1;
 
-            InitScatterplot("48", "All Answers", "46", "4");
-            
-            //Criteria criteria = new Criteria("49","1,2");
-            //VizOperationFilter(criteria); 
+            InitScatterplot("88", "All Answers", "46", "4");
         }
 
 
@@ -80,7 +88,7 @@ namespace TangibleAnchoring
             YAxisLabel.Uid = yAxisQuesid;
             YAxis.Uid = yAxisQuesid;
 
-            DrawPoints(submissionData);
+            DrawPoints(submissionData, 1, 1);
             DrawTicks("XAxis");
             DrawTicks("YAxis");
         }
@@ -254,7 +262,7 @@ namespace TangibleAnchoring
         /// question, current answer and the two axes.
         /// </summary>
         /// <param name="submissionData">collection of points</param>
-        private void DrawPoints(Submissions.SubmissionData submissionData)
+        private void DrawPoints(Submissions.SubmissionData submissionData, int xAxisZoom, int yAxisZoom)
         {
             if (submissionData != null)
             {
@@ -271,15 +279,7 @@ namespace TangibleAnchoring
                 //                           SurfaceColors.ButtonBackgroundPressedBrush
                 //                       };
 
-                SolidColorBrush[] viewpointColors = {
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#36ACAA")),
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#FFED00")),
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#F29620")),
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#E30613")),
-                                                       (SolidColorBrush)(new BrushConverter().ConvertFrom("#E30613"))
-                                                    };
+                
 
                 for (int index = 0; index < numPoints; index++)
                 {
@@ -291,7 +291,7 @@ namespace TangibleAnchoring
                     string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                     int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
                     //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                    int tickInterval = (int) XAxisLength / rangeXAxis;
+                    int tickInterval = (int) (XAxisLength / rangeXAxis)*xAxisZoom;
                     double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
 
                     /******** Calculation for topPosition ********/
@@ -361,6 +361,25 @@ namespace TangibleAnchoring
             //Re-initialize the current answer to All Answers
             CurrentAnswer.Content = "All Answers";
            // LogMsg(qText);
+        }
+
+        private void setAnswer(string questionId, string answerId)
+        {
+            //get the question questionText
+            string qText = configData.FindQuestionFromId(questionId).QuestionText;
+
+            if (answerId == "")
+            {
+                CurrentAnswer.Content = "All Answers";
+            }
+            else 
+            {
+                string aText = configData.FindAnswerFromQuesIdAnsId(questionId, answerId).AnswerText;
+                CurrentAnswer.Content = aText;
+                CurrentAnswer.Uid = answerId;
+            }
+                
+            // LogMsg(qText);
         }
 
          /// <summary>
@@ -615,7 +634,7 @@ namespace TangibleAnchoring
         /// <param name="criteria">Compound variable that consists of questionId and answerIDs used for filtering</param>
         private void VizOperationFilter(Criteria criteria) 
         {
-            bool isMatch = false;
+            bool isMatch = true;
             Submission tempSubmission;
             int numPoints = dataPointEllipses.Length;
             for (int i = 0; i < numPoints; i++)
@@ -625,27 +644,15 @@ namespace TangibleAnchoring
                 int numResponses = tempSubmission.Responses.Length;
                 for (int j = 0; j < numResponses; j++)
                 {
-                    if (tempSubmission.Responses[j].QuestionId == criteria.QuestionId)
+                    if (criteria.QuesIdAnsIdsMap.ContainsKey(tempSubmission.Responses[j].QuestionId)) // check only if the criteria includes this questionId else ignore
                     {
-                        int numAnswers = criteria.AnswerIds.Length;
-                        
-                        for (int k = 0; k < numAnswers; k++)
-                        {
-                            if (tempSubmission.Responses[j].AnswerId == criteria.AnswerIds[k])
-                            { //Found a match
-                                isMatch = true;
-                            }
-                        }
+                        isMatch = criteria.Check(tempSubmission.Responses[j].QuestionId, tempSubmission.Responses[j].AnswerId);
+                       
                         if (!isMatch)
                         {
                             dataPointEllipses[i].Visibility = System.Windows.Visibility.Hidden;
-                        }
-                        else
-                        {
-                            isMatch = false; //Reset isMatch
                             break;
                         }
-                        
                     }
                 }
             }
@@ -723,39 +730,69 @@ namespace TangibleAnchoring
         private void OnTangibleAdded(object sender, TagVisualizerEventArgs e)
         {
             TangibleVisualization tangibleViz = (TangibleVisualization)e.TagVisualization;
-            Criteria criteria = new Criteria("49", "");
+            VizOperationReset();
             switch (tangibleViz.VisualizedTag.Value)
             {
                 case 222: //Viewpoint Republican
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
                     //criteria.AnswerIds = configData.FindTangibleFromId("222").Rotation[0].AnswerIds.Split(',');
-                    
+                    tangibleViz.myArrow.Stroke = viewpointColors[6];
+                    tangibleViz.myEllipse.Stroke = viewpointColors[6];
+                    filterCriteria.AddIds("49","6,7");    
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
                     //criteria.AnswerIds = configData.FindTangibleFromId("210").Rotation[0].AnswerIds.Split(',');
+                    tangibleViz.myArrow.Stroke = viewpointColors[3];
+                    tangibleViz.myEllipse.Stroke = viewpointColors[3];
+                    filterCriteria.AddIds("49", "3,4,5");
                     break;
                 case 212: //Viewpoint Democrat
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
-                    //criteria.AnswerIds = configData.FindTangibleFromId("212").Rotation[0].AnswerIds.Split(',');
+                    tangibleViz.myArrow.Stroke = viewpointColors[0];
+                    tangibleViz.myEllipse.Stroke = viewpointColors[0];
+                    filterCriteria.AddIds("49", "1,2");
                     break;
                 case 208: //Question Changer
+                    tangibleViz.TangibleInfo.Content = "Q?";
+                    tangibleViz.myArrow.Stroke = Brushes.Green;
+                    tangibleViz.myEllipse.Stroke = Brushes.Green;
+                    filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
                     break;
                 case 213: //Answer Changer
+                    tangibleViz.TangibleInfo.Content = "Ans?";
+                    tangibleViz.myArrow.Stroke = Brushes.MediumPurple;
+                    tangibleViz.myEllipse.Stroke = Brushes.MediumPurple;
+                    //filterCriteria.AddIds(CurrentQuestion.Uid, CurrentAnswer.Content.ToString());
                     break;
                 case 214: //XAxisStarter
+                    tangibleViz.TangibleInfo.Content = "Xmin";
+                    tangibleViz.myArrow.Stroke = SurfaceColors.Accent3Brush;
+                    tangibleViz.myEllipse.Stroke = SurfaceColors.Accent3Brush;
                     break;
                 case 209: //XAxisEnd
+                    tangibleViz.TangibleInfo.Content = "Xmax";
+                    tangibleViz.myArrow.Stroke = SurfaceColors.Accent3Brush;
+                    tangibleViz.myEllipse.Stroke = SurfaceColors.Accent3Brush;
                     break;
                 case 211: //YAxisStarter
+                    tangibleViz.TangibleInfo.Content = "Ymin";
+                    tangibleViz.myArrow.Stroke = SurfaceColors.ControlAccentBrush;
+                    tangibleViz.myEllipse.Stroke = SurfaceColors.ControlAccentBrush;
                     break;
                 case 215: //YAxisEnd
+                    tangibleViz.TangibleInfo.Content = "Ymax";
+                    tangibleViz.myArrow.Stroke = SurfaceColors.ControlForegroundBrush;
+                    tangibleViz.myEllipse.Stroke = SurfaceColors.ControlForegroundBrush;
                     break;
                 case 223: //Tagger
+                    tangibleViz.TangibleInfo.Content = "Tagger";
+                    tangibleViz.myArrow.Stroke = Brushes.PeachPuff;
+                    tangibleViz.myEllipse.Stroke = Brushes.PeachPuff;
                     break;
             }
-            
-            VizOperationFilter(criteria);
+            LogMsg(filterCriteria.ToLogString());
+            VizOperationFilter(filterCriteria);
         }
 
         /// <summary>
@@ -769,39 +806,113 @@ namespace TangibleAnchoring
             double tOrientation = tangibleViz.Orientation, tX, tY;
             RotateTransform myRotateTransform = new RotateTransform();
             myRotateTransform.Angle = tOrientation;
+            //tOrientation = (tOrientation == 0.0) ? 360.00 : tOrientation;
+            //if (tOrientation < 0)
+            //{
+            //    tOrientation += 360.00;  
+            //}
+            
             tX = tangibleViz.Center.X;
             tY = tangibleViz.Center.Y;
 
             VizOperationReset();
-            Criteria criteria;
             switch (tangibleViz.VisualizedTag.Value)
             {
                 case 222: //Viewpoint Republican
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
-                    tangibleViz.TangibleInfo.Content = tX + " "+tY;
-                    //TODO Code below is a POC of how a rotation tangible would work. Modify to make it react differently to different types of tangibles.
-                    if (tOrientation > 0.0 && tOrientation <= 180.00)
+                    
+
+                    //TODO: A generic appraoach that is based on numberOfFacets and not hardcoded angles
+                    //Approach below has a bug and selects only two facets and not all three
+                    
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
-                        criteria = new Criteria("49", "6");
-                        VizOperationFilter(criteria);
+                        int numFacets = configData.FindTangibleFromId("222").Rotation.Length;
+                        
+                        filterCriteria.RemoveIds("49", "6,7");
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        string facetAnswerIds = configData.FindTangibleFromId("222").Rotation[facetIndex].AnswerIds;
+                        filterCriteria.AddIds("49", facetAnswerIds);
                     }
-                    else if (tOrientation > 180.0 && tOrientation <= 360.00)
-                    {
-                        criteria = new Criteria("49", "7");
-                        VizOperationFilter(criteria);
-                    }
+                    
+
+
+                    ////tangibleViz.TangibleInfo.Content = tX + " "+tY;
+                    //if (tOrientation > 0.0 && tOrientation <= 120.00)
+                    //{
+                    //    filterCriteria.AddIds("49", "6,7");
+                    //}
+                    //else if (tOrientation > 120.0 && tOrientation <= 240.00)
+                    //{
+                    //    filterCriteria.RemoveIds("49", "7");
+                    //    filterCriteria.AddIds("49", "6");
+                    //}
+                    //else if (tOrientation > 240.0 && tOrientation <= 360.00)
+                    //{
+                    //    filterCriteria.RemoveIds("49", "6");
+                    //    filterCriteria.AddIds("49", "7");
+                    //}
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
+
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        int numFacets = configData.FindTangibleFromId("210").Rotation.Length;
+
+                        filterCriteria.RemoveIds("49", "3,4,5");
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        string facetAnswerIds = configData.FindTangibleFromId("210").Rotation[facetIndex].AnswerIds;
+                        filterCriteria.AddIds("49", facetAnswerIds);
+                    }
                     break;
                 case 212: //Viewpoint Democrat
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        int numFacets = configData.FindTangibleFromId("212").Rotation.Length;
+
+                        filterCriteria.RemoveIds("49", "1,2");
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        string facetAnswerIds = configData.FindTangibleFromId("212").Rotation[facetIndex].AnswerIds;
+                        filterCriteria.AddIds("49", facetAnswerIds);
+                    }
                     break;
                 case 208: //Question Changer
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("208").Name;
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        int numFacets = configData.FindTangibleFromId("208").Rotation.Length;
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        string facetQuestionId = configData.FindTangibleFromId("208").Rotation[facetIndex].QuestionId;
+                        string facetAnswerIds = configData.FindTangibleFromId("208").Rotation[facetIndex].AnswerIds;
+                        filterCriteria.AddIds(facetQuestionId, facetAnswerIds);
+                        setQuestion(facetQuestionId);
+                    }
                     break;
                 case 213: //Answer Changer
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("213").Name;
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        //In case of answer changer tangible the Facet list has been left blank because it depends on the question id
+                        int numFacets = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers.Length + 1; //+1 for adding the case in which all answers appear
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers"); //same as removing previously set ids
+                        if (facetIndex == 0) // index 0 corresponds to all answers
+                        {
+                            setAnswer(CurrentQuestion.Uid, "");
+                        }
+                        else
+                        {
+                            string ansId = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers[facetIndex - 1].AnswerId;
+                            filterCriteria.AddIds(CurrentQuestion.Uid, ansId);
+                            setAnswer(CurrentQuestion.Uid, ansId);
+                        }
+                        
+                    }
                     break;
                 case 214: //XAxisStarter
+                    tangibleViz.TangibleInfo.Content = tOrientation;
                     break;
                 case 209: //XAxisEnd
                     break;
@@ -813,11 +924,8 @@ namespace TangibleAnchoring
                     break;
             }
 
-            
-            
-
- 
-
+            LogMsg(filterCriteria.ToLogString());
+            VizOperationFilter(filterCriteria);
         }
 
         /// <summary>
@@ -829,25 +937,26 @@ namespace TangibleAnchoring
         /// <param name="e">Event object containing information about tagvisualization</param>
         private void OnTangibleRemoved(object sender, TagVisualizerEventArgs e)
         {
-            //TODO: Replace next line with a better function that only undoes the effect of the tangible that was just removed and not resets everything.
             VizOperationReset();
-
             TangibleVisualization tangibleViz = (TangibleVisualization)e.TagVisualization;
-
             switch (tangibleViz.VisualizedTag.Value)
             {
                 case 222: //Viewpoint Republican
-                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
+                    filterCriteria.RemoveIds("49", "6,7");
                     break;
                 case 210: //Viewpoint Independent
-                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
+                    filterCriteria.RemoveIds("49", "3,4,5");
                     break;
                 case 212: //Viewpoint Democrat
-                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
+                    filterCriteria.RemoveIds("49", "1,2");
                     break;
                 case 208: //Question Changer
+                    //Do nothing as the question that was set has to persist
                     break;
                 case 213: //Answer Changer
+                    //once the answer changer is taken off the table, filter should be removed
+                   filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers"); //same as removing previously set ids
+                   setAnswer(CurrentQuestion.Uid, "");
                     break;
                 case 214: //XAxisStarter
                     break;
@@ -860,6 +969,8 @@ namespace TangibleAnchoring
                 case 223: //Tagger
                     break;
             }
+            LogMsg(filterCriteria.ToLogString());
+            VizOperationFilter(filterCriteria);
         }
     }
 }
