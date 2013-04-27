@@ -60,10 +60,10 @@
                 <Line Name = "XAxis"
                       Stroke = "DarkSlateGray"
                       StrokeThickness="1"
-                      X1 = "120"
-            Y1 = "960"
+                      X1 = "160"
+            Y1 = "920"
             X2 = "1900"
-            Y2 = "960" 
+            Y2 = "920" 
              />
 
                 <Label x:Name="XAxisLabel" 
@@ -80,10 +80,10 @@
                       Uid=""
                       Stroke = "DarkSlateGray"
                       StrokeThickness="1"
-                      X1 = "120"
+                      X1 = "160"
             Y1 = "80"
-            X2 = "120"
-            Y2 = "960" />
+            X2 = "160"
+            Y2 = "920" />
                 
                 <Label x:Name="YAxisLabel" 
                        Uid=""
@@ -91,7 +91,7 @@
                FontSize="24"
                Content="YAxis"
                Canvas.Left="32"
-               Canvas.Top="540" 
+               Canvas.Top="580" 
               >
                     <Label.RenderTransform>
                         <RotateTransform Angle="-90" />
