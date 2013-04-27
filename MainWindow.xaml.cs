@@ -201,7 +201,7 @@ namespace TangibleAnchoring
                         tLabel.FontSize = 18;
                         tLabel.Content = ques.Answers[index].AnswerText;
                         tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
-                        tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                        tLabel.SetValue(Canvas.TopProperty, tick.Y1 - step/2 - tLabel.FontSize);
                         //MainCanvas.RegisterName(tLabel.Name, tLabel);
                         MainCanvas.Children.Add(tLabel);
 
@@ -355,23 +355,42 @@ namespace TangibleAnchoring
                         string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                         int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
                         //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                        int tickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
-                        double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
+                        int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                        double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
 
                         /******** Calculation for topPosition ********/
                         //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
                         //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
                         //ASSUMPTION Hard coding the YAxis vairable to be Age
+                       
                         string quesIdForYAxis = YAxis.Uid;
-                        string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
-                        double rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
-                        //For general case use the answerId found in next statement to find the x,y position
-                        //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                        //For Age, get direct value of age from sData
-                        int answerValue = sData.Age;
+                        double topPosition = 0.0, rangeYAxis = 0.0;
+                        switch (quesIdForYAxis)
+                        {
+                            case "4": //Age
+                                string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
+                                rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
+                                //For general case use the answerId found in next statement to find the x,y position
+                                //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                                //For Age, get direct value of age from sData
+                                int answerValue = sData.Age;
 
-                        //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
-                        double topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                                //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                                topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+
+                                break;
+                            case "5": //Obama or Romney
+
+                                string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                                rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
+                                //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                                int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
+                                topPosition = YAxis.Y2  -  yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10;
+                                //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                               // topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                                break;
+                        }
+                        
                         dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
                         dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
                         dataPointEllipses[index].Name = "data_" + index;
@@ -397,26 +416,40 @@ namespace TangibleAnchoring
                         //TODO replace 700 by minimum value for the variable
                         //double leftPosition = (double)(((int.Parse(sData.UserId) - 700) * 2) % WAWidth);
                         //double bottomPosition = (double)(((sData.Age) * 10) % WAHeight);
-                        string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
+                         string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                         int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
                         //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                        int tickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
-                        double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
+                        int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                        double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
 
-                        /******** Calculation for topPosition ********/
-                        //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
-                        //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
-                        //ASSUMPTION Hard coding the YAxis vairable to be Age
+
                         string quesIdForYAxis = YAxis.Uid;
-                        string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
-                        double rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
-                        //For general case use the answerId found in next statement to find the x,y position
-                        //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                        //For Age, get direct value of age from sData
-                        int answerValue = sData.Age;
+                        double topPosition = 0.0, rangeYAxis = 0.0;
+                        switch (quesIdForYAxis)
+                        {
+                            case "4": //Age
+                                string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
+                                rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
+                                //For general case use the answerId found in next statement to find the x,y position
+                                //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                                //For Age, get direct value of age from sData
+                                int answerValue = sData.Age;
 
-                        //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
-                        double topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                                //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                                topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+
+                                break;
+                            case "5": //Obama or Romney
+
+                                string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                                rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
+                                //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                                int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
+                                topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
+                                //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                                // topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                                break;
+                        }
                         dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
                         dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
 
@@ -630,7 +663,7 @@ namespace TangibleAnchoring
             //TODO Make the text dynamic as per axis or static based on what susan needs
 
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, XAxisLabel.Content +": {0}", configData.FindQuestionFromId(XAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(XAxis.Uid).AnswerId)-1].AnswerText));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, YAxisLabel.Content +": {0}", submission.Age.ToString()));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, YAxisLabel.Content + ": {0}", (YAxis.Uid == "4") ? submission.Age.ToString() : configData.FindQuestionFromId(YAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(YAxis.Uid).AnswerId) - 1].AnswerText));
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Affiliation: {0}", configData.FindAnswerFromQuesIdAnsId("49", submission.FindResponseFromQuestionId("49").AnswerId).AnswerText));
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Response: {0}", configData.FindAnswerFromQuesIdAnsId(CurrentQuestion.Uid, submission.FindResponseFromQuestionId(CurrentQuestion.Uid).AnswerId).AnswerText));
 
@@ -1022,6 +1055,22 @@ namespace TangibleAnchoring
                 case 209: //XAxisEnd
                     break;
                 case 211: //YAxisStarter
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        int numFacets = configData.FindTangibleFromId("211").Rotation.Length;
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        string facetQuestionId = configData.FindTangibleFromId("211").Rotation[facetIndex].QuestionId;
+                        string facetAnswerIds = configData.FindTangibleFromId("211").Rotation[facetIndex].AnswerIds;
+
+                        if (prevYMinFacetIndex != facetIndex)
+                        {
+                            setYAxis(facetQuestionId);
+                            redrawPoints = true;
+                            DrawYTicks();
+                            DrawPoints(1, 1);
+                            prevYMinFacetIndex = facetIndex;
+                        }
+                    }
                     break;
                 case 215: //YAxisEnd
                     break;
