@@ -27,6 +27,8 @@ namespace TangibleAnchoring
         private Ellipse[] dataPointEllipses;
         private Criteria filterCriteria = new Criteria("49","All Answers");
         Ellipse haloEllipse = new Ellipse();
+        bool allowTagging = false;
+        Dictionary<string, Ellipse> taggedEllipses = new Dictionary<string, Ellipse>();
 
         SolidColorBrush[] viewpointColors = {
                                                        (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
@@ -403,28 +405,48 @@ namespace TangibleAnchoring
         private void DataPointTouchEnter(object sender, TouchEventArgs e)
         {
             Ellipse senderEllipse = sender as Ellipse;
-            
-            haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width/4);
-            haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height/4);
-            haloEllipse.Height = 30;
-            haloEllipse.Width = 30;
-            haloEllipse.Stroke = SurfaceColors.BulletBrush;
-            haloEllipse.StrokeThickness = 2;
-            MainCanvas.Children.Remove(haloEllipse); //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
-            MainCanvas.Children.Add(haloEllipse);
-
             int submissionIndex = int.Parse(senderEllipse.Name.Split('_')[1]);
-            Submission submission = submissionData.Submissions[submissionIndex];
-            if (senderEllipse != null)
+            if (allowTagging)
             {
-                LogMsg(submission.UserId);
-
-                //Interactively remove elements that have been touched (could make for a game)
-                //MainCanvas.Children.Remove(senderEllipse);
+                if (!taggedEllipses.ContainsKey("tag_" + submissionIndex)) //if the ellipse has not been tagged already
+                {
+                    Ellipse tagEllipse = new Ellipse();
+                    tagEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width / 4);
+                    tagEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height / 4);
+                    tagEllipse.Height = 30;
+                    tagEllipse.Width = 30;
+                    tagEllipse.Stroke = Brushes.Aqua;
+                    tagEllipse.Uid = "tag_" + submissionIndex;
+                    tagEllipse.StrokeThickness = 2;
+                    MainCanvas.Children.Add(tagEllipse);
+                    taggedEllipses.Add(tagEllipse.Uid, tagEllipse);
+                }
             }
+            else
+            {
+                haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width / 4);
+                haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height / 4);
+                haloEllipse.Height = 30;
+                haloEllipse.Width = 30;
+                haloEllipse.Stroke = Brushes.AntiqueWhite;
+                haloEllipse.StrokeThickness = 2;
+                MainCanvas.Children.Remove(haloEllipse); //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
+                MainCanvas.Children.Add(haloEllipse);
 
-            //This will produce details on demand
-            UpdateDescription(RootGrid, e.TouchDevice, submission, true);
+               
+                Submission submission = submissionData.Submissions[submissionIndex];
+                if (senderEllipse != null)
+                {
+                    LogMsg(submission.UserId);
+
+                    //Interactively remove elements that have been touched (could make for a game)
+                    //MainCanvas.Children.Remove(senderEllipse);
+                }
+
+                //This will produce details on demand
+                UpdateDescription(RootGrid, e.TouchDevice, submission, true);
+            }
+            
 
             // Capture to the ellipse.  
             //e.TouchDevice.Capture(senderEllipse);
@@ -651,6 +673,8 @@ namespace TangibleAnchoring
                         if (!isMatch)
                         {
                             dataPointEllipses[i].Visibility = System.Windows.Visibility.Hidden;
+                            if (taggedEllipses.ContainsKey("tag_" + i)) { taggedEllipses["tag_" + i].Visibility = System.Windows.Visibility.Hidden; }
+                            
                             break;
                         }
                     }
@@ -664,6 +688,7 @@ namespace TangibleAnchoring
             for (int i = 0; i < numPoints; i++)
             {
                 dataPointEllipses[i].Visibility = System.Windows.Visibility.Visible;
+                if (taggedEllipses.ContainsKey("tag_" + i)) { taggedEllipses["tag_" + i].Visibility = System.Windows.Visibility.Visible; }
             }
         }
 
@@ -789,6 +814,7 @@ namespace TangibleAnchoring
                     tangibleViz.TangibleInfo.Content = "Tagger";
                     tangibleViz.myArrow.Stroke = Brushes.PeachPuff;
                     tangibleViz.myEllipse.Stroke = Brushes.PeachPuff;
+                    allowTagging = true;
                     break;
             }
             LogMsg(filterCriteria.ToLogString());
@@ -954,7 +980,7 @@ namespace TangibleAnchoring
                     //Do nothing as the question that was set has to persist
                     break;
                 case 213: //Answer Changer
-                    //once the answer changer is taken off the table, filter should be removed
+                    //Once the answer changer is taken off the table, filter should be removed
                    filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers"); //same as removing previously set ids
                    setAnswer(CurrentQuestion.Uid, "");
                     break;
@@ -967,6 +993,14 @@ namespace TangibleAnchoring
                 case 215: //YAxisEnd
                     break;
                 case 223: //Tagger
+                    allowTagging = false;
+
+                    //Remove the ellipses from MainCanvas and clear the taggedEllipses list
+                    foreach (string tagKey in taggedEllipses.Keys)
+                    {
+                        MainCanvas.Children.Remove(taggedEllipses[tagKey]);
+                    }
+                    taggedEllipses.Clear();
                     break;
             }
             LogMsg(filterCriteria.ToLogString());
