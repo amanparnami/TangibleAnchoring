@@ -28,7 +28,22 @@ namespace TangibleAnchoring
         private Criteria filterCriteria = new Criteria("49","All Answers");
         Ellipse haloEllipse = new Ellipse();
         bool allowTagging = false;
+        bool redrawPoints = false;
+
+        //Following variables are declared to avoid continuous calls to setAxis and DrawPoints
+        int prevXMinFacetIndex = 0,
+            prevYMinFacetIndex = 0,
+            prevAnsChangerFacetIndex = 0,
+            prevQuesChangerFacetIndex = 0,
+            prevRepViewPtFacetIndex = 0,
+            prevDemViewPtFacetIndex = 0,
+            prevIndViewPtFacetIndex = 0;
+
         Dictionary<string, Ellipse> taggedEllipses = new Dictionary<string, Ellipse>();
+        Dictionary<string, Line> xTickLines = new Dictionary<string, Line>();
+        Dictionary<string, Label> xTickLabels = new Dictionary<string, Label>();
+        Dictionary<string, Line> yTickLines = new Dictionary<string, Line>();
+        Dictionary<string, Label> yTickLabels = new Dictionary<string, Label>();
 
         SolidColorBrush[] viewpointColors = {
                                                        (SolidColorBrush)(new BrushConverter().ConvertFrom("#1D71B8")),
@@ -77,22 +92,18 @@ namespace TangibleAnchoring
         }
 
 
-        private void InitScatterplot(string quesId, string ansId, string xAxisQuesId, string yAxisQuesid)
+        private void InitScatterplot(string quesId, string ansId, string xAxisQuesId, string yAxisQuesId)
         {
             setQuestion(quesId);
             // Initialize the XAxis
-            XAxisLabel.Content = configData.FindQuestionFromId(xAxisQuesId).QuestionText;
-            XAxisLabel.Uid = xAxisQuesId;
-            XAxis.Uid = xAxisQuesId;
+            setXAxis(xAxisQuesId);
 
             // Initialize the YAxis
-            YAxisLabel.Content = configData.FindQuestionFromId(yAxisQuesid).QuestionText;
-            YAxisLabel.Uid = yAxisQuesid;
-            YAxis.Uid = yAxisQuesid;
+            setYAxis(yAxisQuesId);
 
-            DrawPoints(submissionData, 1, 1);
-            DrawTicks("XAxis");
-            DrawTicks("YAxis");
+            DrawPoints(1, 1);
+            DrawXTicks();
+            DrawYTicks();
         }
 
         /// <summary>
@@ -104,51 +115,67 @@ namespace TangibleAnchoring
             LogMessageLabel.Content = message;
         }
 
-
-        private void DrawTicks(string axis)
+        private void setQuestion(string questionId)
         {
-            //TODO Clear previous ticks
-            string qId;
+            //get the question questionText
+            string qText = configData.FindQuestionFromId(questionId).QuestionText;
+            CurrentQuestion.Content = qText;
+            CurrentQuestion.Uid = questionId;
+
+            //Re-initialize the current answer to All Answers
+            CurrentAnswer.Content = "All Answers";
+            // LogMsg(qText);
+        }
+
+        private void setAnswer(string questionId, string answerId)
+        {
+            //get the question questionText
+            string qText = configData.FindQuestionFromId(questionId).QuestionText;
+
+            if (answerId == "")
+            {
+                CurrentAnswer.Content = "All Answers";
+            }
+            else
+            {
+                string aText = configData.FindAnswerFromQuesIdAnsId(questionId, answerId).AnswerText;
+                CurrentAnswer.Content = aText;
+                CurrentAnswer.Uid = answerId;
+            }
+
+            // LogMsg(qText);
+        }
+
+        private void setXAxis(string xAxisQuesId)
+        {
+            XAxisLabel.Content = configData.FindQuestionFromId(xAxisQuesId).QuestionText;
+            XAxisLabel.Uid = xAxisQuesId;
+            XAxis.Uid = xAxisQuesId;
+        }
+
+        private void setYAxis(string yAxisQuesId)
+        {
+            YAxisLabel.Content = configData.FindQuestionFromId(yAxisQuesId).QuestionText;
+            YAxisLabel.Uid = yAxisQuesId;
+            YAxis.Uid = yAxisQuesId;
+        }
+        private void DrawYTicks() 
+        {
+             string qId;
             SolidColorBrush tickLabelColorBrush = new SolidColorBrush();
             tickLabelColorBrush.Color = SurfaceColors.ControlBorderColor;
-            if (axis == "XAxis")
-            {
-                qId = XAxis.Uid;
-                Question ques = configData.FindQuestionFromId(qId);
-                int numAnswers = ques.Answers.Length;
-                double step = XAxisLength / numAnswers;
-                //Since we want to be able to spread the data points that align
-                // in a line for a value, the lowest value of XAxis will start from second tick
-                
-                for (int index = 0; index < numAnswers; index++)
-                {
-                    Line tick = new Line();
-                    tick.Name = "XTick_" + index;
-                    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
-                    tick.X1 = XAxis.X1 + index * step;
-                    tick.Y1 = XAxis.Y1 - 10.00;
-                    tick.X2 = tick.X1;
-                    tick.Y2 = XAxis.Y1 + 10.00;
-                    tick.StrokeThickness = 1;
-                    MainCanvas.RegisterName(tick.Name, tick);
-                    MainCanvas.Children.Add(tick);
-                    
 
-                    Label tLabel = new Label();
-                    tLabel.Name = "XTickLabel_" + index;
-                    tLabel.Foreground = tickLabelColorBrush;
-                    tLabel.FontSize = 18;
-                    tLabel.Content = ques.Answers[index].AnswerText;
-                    tLabel.SetValue(Canvas.LeftProperty, tick.X1 + step / 2 - (tLabel.Content.ToString().Length * (tLabel.FontSize * 0.75))/2);
-                    tLabel.SetValue(Canvas.TopProperty, tick.Y1 + 20);
-                    MainCanvas.RegisterName(tLabel.Name, tLabel);
-                    MainCanvas.Children.Add(tLabel);
-                    
+             qId = YAxis.Uid;
+                //Clear previous yTicks before starting afresh
+                foreach (string yTickKey in yTickLines.Keys)
+                {
+                    string index = yTickKey.Split('_')[1];
+                    MainCanvas.Children.Remove(yTickLines[yTickKey]);
+                    MainCanvas.Children.Remove(yTickLabels["YTickLabel_" + index]);
                 }
-            } 
-            else if (axis == "YAxis")
-            {
-                qId = YAxis.Uid;
+                yTickLabels.Clear();
+                yTickLines.Clear();
+
                 Question ques = configData.FindQuestionFromId(qId);
                 if (ques.Answers != null)
                 {
@@ -164,7 +191,7 @@ namespace TangibleAnchoring
                         tick.X2 = YAxis.X1 + 10.00;
                         tick.Y2 = tick.Y1;
                         tick.StrokeThickness = 1;
-                        MainCanvas.RegisterName(tick.Name, tick);
+                        //MainCanvas.RegisterName(tick.Name, tick);
                         MainCanvas.Children.Add(tick);
                         
 
@@ -175,10 +202,11 @@ namespace TangibleAnchoring
                         tLabel.Content = ques.Answers[index].AnswerText;
                         tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
                         tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
-                        MainCanvas.RegisterName(tLabel.Name, tLabel);
+                        //MainCanvas.RegisterName(tLabel.Name, tLabel);
                         MainCanvas.Children.Add(tLabel);
 
-                        
+                        yTickLines.Add(tick.Name, tick);
+                        yTickLabels.Add(tLabel.Name, tLabel);
                     }
                 } else if (ques.AnswerRange != null)
                 {
@@ -203,7 +231,7 @@ namespace TangibleAnchoring
                             tick.Y2 = tick.Y1;
                             tick.StrokeThickness = 1;
                             MainCanvas.Children.Add(tick);
-                            MainCanvas.RegisterName(tick.Name, tick);
+                            //MainCanvas.RegisterName(tick.Name, tick);
 
                             Label tLabel = new Label();
                             tLabel.Name = "YTickLabel_" + index;
@@ -213,7 +241,9 @@ namespace TangibleAnchoring
                             tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
                             tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
                             MainCanvas.Children.Add(tLabel);
-                            MainCanvas.RegisterName(tLabel.Name, tLabel);
+                           // MainCanvas.RegisterName(tLabel.Name, tLabel);
+                            yTickLines.Add(tick.Name, tick);
+                            yTickLabels.Add(tLabel.Name, tLabel);
                         }
                     }
                     else if (range > 10)
@@ -231,7 +261,7 @@ namespace TangibleAnchoring
                             tick.Y2 = tick.Y1;
                             tick.StrokeThickness = 1;
                             MainCanvas.Children.Add(tick);
-                            MainCanvas.RegisterName(tick.Name, tick);
+                            //MainCanvas.RegisterName(tick.Name, tick);
 
                             Label tLabel = new Label();
                             tLabel.Name = "YTickLabel_" + index;
@@ -241,22 +271,65 @@ namespace TangibleAnchoring
                             tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
                             tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
                             MainCanvas.Children.Add(tLabel);
-                            MainCanvas.RegisterName(tLabel.Name, tLabel);
+                            //MainCanvas.RegisterName(tLabel.Name, tLabel);
+                            yTickLines.Add(tick.Name, tick);
+                            yTickLabels.Add(tLabel.Name, tLabel);
                         }
                     }
                 }
-            }
-
         }
 
-       
+        private void DrawXTicks()
+        {
+            string qId;
+            SolidColorBrush tickLabelColorBrush = new SolidColorBrush();
+            tickLabelColorBrush.Color = SurfaceColors.ControlBorderColor;
+           
+                //Clear previous xTicks before starting afresh
+                foreach (string xTickKey in xTickLines.Keys)
+                {
+                    string index = xTickKey.Split('_')[1];
+                    MainCanvas.Children.Remove(xTickLines[xTickKey]);
+                    MainCanvas.Children.Remove(xTickLabels["XTickLabel_" + index]);
+                }
+                xTickLabels.Clear();
+                xTickLines.Clear();
 
-        /// <summary>
-        /// Logic for drawing X, Y axes labels.
-        /// </summary>
-        private void DrawAxesLabels(string xAxisLabel, string yAxisLabel)
-        { 
-            
+                qId = XAxis.Uid;
+                Question ques = configData.FindQuestionFromId(qId);
+                int numAnswers = ques.Answers.Length;
+                double step = XAxisLength / numAnswers;
+                //Since we want to be able to spread the data points that align
+                // in a line for a value, the lowest value of XAxis will start from second tick
+                
+                for (int index = 0; index < numAnswers; index++)
+                {
+                    
+                    Line tick = new Line();
+                    tick.Name = "XTick_" + index;
+                    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                    tick.X1 = XAxis.X1 + index * step;
+                    tick.Y1 = XAxis.Y1 - 10.00;
+                    tick.X2 = tick.X1;
+                    tick.Y2 = XAxis.Y1 + 10.00;
+                    tick.StrokeThickness = 1;
+                    //MainCanvas.RegisterName(tick.Name, tick);
+                    MainCanvas.Children.Add(tick);
+                    
+
+                    Label tLabel = new Label();
+                    tLabel.Name = "XTickLabel_" + index;
+                    tLabel.Foreground = tickLabelColorBrush;
+                    tLabel.FontSize = 18;
+                    tLabel.Content = ques.Answers[index].AnswerText;
+                    tLabel.SetValue(Canvas.LeftProperty, tick.X1 + step / 2 - (tLabel.Content.ToString().Length * (tLabel.FontSize * 0.75))/2);
+                    tLabel.SetValue(Canvas.TopProperty, tick.Y1 + 20);
+                    //MainCanvas.RegisterName(tLabel.Name, tLabel);
+                    MainCanvas.Children.Add(tLabel);
+
+                    xTickLines.Add(tick.Name, tick);
+                    xTickLabels.Add(tLabel.Name, tLabel);
+                }
         }
 
         /// <summary>
@@ -264,68 +337,92 @@ namespace TangibleAnchoring
         /// question, current answer and the two axes.
         /// </summary>
         /// <param name="submissionData">collection of points</param>
-        private void DrawPoints(Submissions.SubmissionData submissionData, int xAxisZoom, int yAxisZoom)
+        private void DrawPoints(int xAxisZoom, int yAxisZoom)
         {
             if (submissionData != null)
             {
                 int numPoints = submissionData.Submissions.Length;
                 Random r = new Random();
-
-                //SolidColorBrush[] viewpointColors = {
-                //                           SurfaceColors.Accent1Brush,
-                //                           SurfaceColors.Accent2Brush, 
-                //                           SurfaceColors.Accent3Brush, 
-                //                           SurfaceColors.Accent4Brush,
-                //                           SurfaceColors.BulletBrush, 
-                //                           SurfaceColors.ButtonBackgroundBrush, 
-                //                           SurfaceColors.ButtonBackgroundPressedBrush
-                //                       };
-
-                
-
-                for (int index = 0; index < numPoints; index++)
+                if (!redrawPoints) //first time draw
                 {
-                    dataPointEllipses[index] = new Ellipse();
-                    Submissions.Submission sData = submissionData.Submissions[index];
-                    //TODO replace 700 by minimum value for the variable
-                    //double leftPosition = (double)(((int.Parse(sData.UserId) - 700) * 2) % WAWidth);
-                    //double bottomPosition = (double)(((sData.Age) * 10) % WAHeight);
-                    string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
-                    int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
-                    //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                    int tickInterval = (int) (XAxisLength / rangeXAxis)*xAxisZoom;
-                    double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
+                    for (int index = 0; index < numPoints; index++)
+                    {
+                        dataPointEllipses[index] = new Ellipse();
+                        Submissions.Submission sData = submissionData.Submissions[index];
+                        //TODO replace 700 by minimum value for the variable
+                        //double leftPosition = (double)(((int.Parse(sData.UserId) - 700) * 2) % WAWidth);
+                        //double bottomPosition = (double)(((sData.Age) * 10) % WAHeight);
+                        string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
+                        int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
+                        //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                        int tickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                        double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
 
-                    /******** Calculation for topPosition ********/
-                    //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
-                    //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
-                    //ASSUMPTION Hard coding the YAxis vairable to be Age
-                    string quesIdForYAxis = YAxis.Uid;
-                    string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
-                    double rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
-                    //For general case use the answerId found in next statement to find the x,y position
-                    //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                    //For Age, get direct value of age from sData
-                    int answerValue = sData.Age;
+                        /******** Calculation for topPosition ********/
+                        //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
+                        //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
+                        //ASSUMPTION Hard coding the YAxis vairable to be Age
+                        string quesIdForYAxis = YAxis.Uid;
+                        string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
+                        double rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
+                        //For general case use the answerId found in next statement to find the x,y position
+                        //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                        //For Age, get direct value of age from sData
+                        int answerValue = sData.Age;
 
-                    //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
-                    double topPosition = YAxis.Y2 - (double) answerValue * (YAxisLength / rangeYAxis) - 10;
-                    dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
-                    dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
-                    dataPointEllipses[index].Name = "data_" + index;
-                    dataPointEllipses[index].Uid += index; 
-                    
-                    //Dynamic assignment of touch event handler
-                    dataPointEllipses[index].TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
-                    dataPointEllipses[index].TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
-                    dataPointEllipses[index].Height = 20;
-                    dataPointEllipses[index].Width = 20;
+                        //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                        double topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                        dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
+                        dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
+                        dataPointEllipses[index].Name = "data_" + index;
+                        dataPointEllipses[index].Uid += index;
 
-                    // AnswerId - 1 because viewpoints are numbered from 1..7 
-                    dataPointEllipses[index].Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
-                    dataPointEllipses[index].Opacity = 0.6;
-                    MainCanvas.Children.Add(dataPointEllipses[index]);
+                        //Dynamic assignment of touch event handler
+                        dataPointEllipses[index].TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
+                        dataPointEllipses[index].TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
+                        dataPointEllipses[index].Height = 20;
+                        dataPointEllipses[index].Width = 20;
+
+                        // AnswerId - 1 because viewpoints are numbered from 1..7 
+                        dataPointEllipses[index].Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
+                        dataPointEllipses[index].Opacity = 0.6;
+                        MainCanvas.Children.Add(dataPointEllipses[index]);
+                    }
                 }
+                else //redrawing
+                {
+                    for (int index = 0; index < numPoints; index++)
+                    {
+                        Submissions.Submission sData = submissionData.Submissions[index];
+                        //TODO replace 700 by minimum value for the variable
+                        //double leftPosition = (double)(((int.Parse(sData.UserId) - 700) * 2) % WAWidth);
+                        //double bottomPosition = (double)(((sData.Age) * 10) % WAHeight);
+                        string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
+                        int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
+                        //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                        int tickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                        double leftPosition = YAxis.X1 + tickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(tickInterval);
+
+                        /******** Calculation for topPosition ********/
+                        //If there is a range variable on YAxis then we will have to scale as per range and YAxisLength
+                        //ASSUMPTION That the variable is a range, else just follow the example of leftPosition
+                        //ASSUMPTION Hard coding the YAxis vairable to be Age
+                        string quesIdForYAxis = YAxis.Uid;
+                        string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
+                        double rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
+                        //For general case use the answerId found in next statement to find the x,y position
+                        //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                        //For Age, get direct value of age from sData
+                        int answerValue = sData.Age;
+
+                        //TODO Replace 120.00 by a variable that represents the y value of the origin of the axis
+                        double topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                        dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
+                        dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
+
+                    }
+                }
+                redrawPoints = false;
             }
         }
 
@@ -352,37 +449,6 @@ namespace TangibleAnchoring
             
         //    return newTick;
         //}
-
-        private void setQuestion(string questionId)
-        {
-            //get the question questionText
-            string qText = configData.FindQuestionFromId(questionId).QuestionText;
-            CurrentQuestion.Content = qText;
-            CurrentQuestion.Uid = questionId;
-
-            //Re-initialize the current answer to All Answers
-            CurrentAnswer.Content = "All Answers";
-           // LogMsg(qText);
-        }
-
-        private void setAnswer(string questionId, string answerId)
-        {
-            //get the question questionText
-            string qText = configData.FindQuestionFromId(questionId).QuestionText;
-
-            if (answerId == "")
-            {
-                CurrentAnswer.Content = "All Answers";
-            }
-            else 
-            {
-                string aText = configData.FindAnswerFromQuesIdAnsId(questionId, answerId).AnswerText;
-                CurrentAnswer.Content = aText;
-                CurrentAnswer.Uid = answerId;
-            }
-                
-            // LogMsg(qText);
-        }
 
          /// <summary>
         /// Touch Event handler for dynamically added data point.
@@ -760,14 +826,13 @@ namespace TangibleAnchoring
             {
                 case 222: //Viewpoint Republican
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
-                    //criteria.AnswerIds = configData.FindTangibleFromId("222").Rotation[0].AnswerIds.Split(',');
                     tangibleViz.myArrow.Stroke = viewpointColors[6];
                     tangibleViz.myEllipse.Stroke = viewpointColors[6];
+                    //TODO could replace "49" with the question corresponding to viewpoint tangible and the answer ids to the ids in facet[0]
                     filterCriteria.AddIds("49","6,7");    
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
-                    //criteria.AnswerIds = configData.FindTangibleFromId("210").Rotation[0].AnswerIds.Split(',');
                     tangibleViz.myArrow.Stroke = viewpointColors[3];
                     tangibleViz.myEllipse.Stroke = viewpointColors[3];
                     filterCriteria.AddIds("49", "3,4,5");
@@ -788,7 +853,6 @@ namespace TangibleAnchoring
                     tangibleViz.TangibleInfo.Content = "Ans?";
                     tangibleViz.myArrow.Stroke = Brushes.MediumPurple;
                     tangibleViz.myEllipse.Stroke = Brushes.MediumPurple;
-                    //filterCriteria.AddIds(CurrentQuestion.Uid, CurrentAnswer.Content.ToString());
                     break;
                 case 214: //XAxisStarter
                     tangibleViz.TangibleInfo.Content = "Xmin";
@@ -847,37 +911,18 @@ namespace TangibleAnchoring
                 case 222: //Viewpoint Republican
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
                     
-
-                    //TODO: A generic appraoach that is based on numberOfFacets and not hardcoded angles
-                    //Approach below has a bug and selects only two facets and not all three
-                    
                     if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("222").Rotation.Length;
-                        
-                        filterCriteria.RemoveIds("49", "6,7");
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetAnswerIds = configData.FindTangibleFromId("222").Rotation[facetIndex].AnswerIds;
-                        filterCriteria.AddIds("49", facetAnswerIds);
+                        if (prevRepViewPtFacetIndex != facetIndex)
+                        {
+                            filterCriteria.RemoveIds("49", "6,7");
+                            filterCriteria.AddIds("49", facetAnswerIds);
+                            prevRepViewPtFacetIndex = facetIndex;
+                        }
                     }
-                    
-
-
-                    ////tangibleViz.TangibleInfo.Content = tX + " "+tY;
-                    //if (tOrientation > 0.0 && tOrientation <= 120.00)
-                    //{
-                    //    filterCriteria.AddIds("49", "6,7");
-                    //}
-                    //else if (tOrientation > 120.0 && tOrientation <= 240.00)
-                    //{
-                    //    filterCriteria.RemoveIds("49", "7");
-                    //    filterCriteria.AddIds("49", "6");
-                    //}
-                    //else if (tOrientation > 240.0 && tOrientation <= 360.00)
-                    //{
-                    //    filterCriteria.RemoveIds("49", "6");
-                    //    filterCriteria.AddIds("49", "7");
-                    //}
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
@@ -885,11 +930,14 @@ namespace TangibleAnchoring
                     if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("210").Rotation.Length;
-
-                        filterCriteria.RemoveIds("49", "3,4,5");
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetAnswerIds = configData.FindTangibleFromId("210").Rotation[facetIndex].AnswerIds;
-                        filterCriteria.AddIds("49", facetAnswerIds);
+                        if (prevIndViewPtFacetIndex != facetIndex)
+                        {
+                            filterCriteria.RemoveIds("49", "3,4,5");
+                            filterCriteria.AddIds("49", facetAnswerIds);
+                            prevIndViewPtFacetIndex = facetIndex;
+                        }
                     }
                     break;
                 case 212: //Viewpoint Democrat
@@ -897,11 +945,14 @@ namespace TangibleAnchoring
                     if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("212").Rotation.Length;
-
-                        filterCriteria.RemoveIds("49", "1,2");
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetAnswerIds = configData.FindTangibleFromId("212").Rotation[facetIndex].AnswerIds;
-                        filterCriteria.AddIds("49", facetAnswerIds);
+                        if (prevDemViewPtFacetIndex != facetIndex)
+                        {
+                            filterCriteria.RemoveIds("49", "1,2");
+                            filterCriteria.AddIds("49", facetAnswerIds);
+                            prevDemViewPtFacetIndex = facetIndex;
+                        }
                     }
                     break;
                 case 208: //Question Changer
@@ -912,8 +963,15 @@ namespace TangibleAnchoring
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetQuestionId = configData.FindTangibleFromId("208").Rotation[facetIndex].QuestionId;
                         string facetAnswerIds = configData.FindTangibleFromId("208").Rotation[facetIndex].AnswerIds;
-                        filterCriteria.AddIds(facetQuestionId, facetAnswerIds);
-                        setQuestion(facetQuestionId);
+                        if (prevQuesChangerFacetIndex != facetIndex)
+                        {
+                            //Remove the left over answerIds from other questions
+                            //FIX for the bug where when question and answer tangible are rotated together then there are leftover answerIds in previous question
+                            filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
+                            filterCriteria.AddIds(facetQuestionId, facetAnswerIds);
+                            setQuestion(facetQuestionId);
+                            prevQuesChangerFacetIndex = facetIndex;
+                        }
                     }
                     break;
                 case 213: //Answer Changer
@@ -923,22 +981,43 @@ namespace TangibleAnchoring
                         //In case of answer changer tangible the Facet list has been left blank because it depends on the question id
                         int numFacets = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers.Length + 1; //+1 for adding the case in which all answers appear
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
-                        filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers"); //same as removing previously set ids
-                        if (facetIndex == 0) // index 0 corresponds to all answers
+                        if (prevAnsChangerFacetIndex != facetIndex)
                         {
-                            setAnswer(CurrentQuestion.Uid, "");
-                        }
-                        else
-                        {
-                            string ansId = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers[facetIndex - 1].AnswerId;
-                            filterCriteria.AddIds(CurrentQuestion.Uid, ansId);
-                            setAnswer(CurrentQuestion.Uid, ansId);
+                            if (facetIndex == 0) // index 0 corresponds to all answers
+                            {
+                                setAnswer(CurrentQuestion.Uid, "");
+                                filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
+                            }
+                            else
+                            {
+                                string ansId = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers[facetIndex - 1].AnswerId;
+                                //Since we know that at a time only one answer can appear for answer changer tangible we will manually replace the value of first element in criteria
+                                filterCriteria.QuesIdAnsIdsMap[CurrentQuestion.Uid][0] = ansId;
+                                setAnswer(CurrentQuestion.Uid, ansId);
+                            }
+                            prevAnsChangerFacetIndex = facetIndex;
                         }
                         
                     }
                     break;
                 case 214: //XAxisStarter
-                    tangibleViz.TangibleInfo.Content = tOrientation;
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("214").Name;
+                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        int numFacets = configData.FindTangibleFromId("214").Rotation.Length;
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+                        string facetQuestionId = configData.FindTangibleFromId("214").Rotation[facetIndex].QuestionId;
+                        string facetAnswerIds = configData.FindTangibleFromId("214").Rotation[facetIndex].AnswerIds;
+
+                        if (prevXMinFacetIndex != facetIndex)
+                        {
+                            setXAxis(facetQuestionId);
+                            redrawPoints = true;
+                            DrawXTicks();
+                            DrawPoints(1, 1);
+                            prevXMinFacetIndex = facetIndex;
+                        }
+                    }
                     break;
                 case 209: //XAxisEnd
                     break;
