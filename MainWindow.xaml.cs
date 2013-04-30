@@ -26,12 +26,16 @@ namespace TangibleAnchoring
         private readonly Submissions.SubmissionData submissionData;
         private Ellipse[] dataPointEllipses;
         private double[] dataPointLeftPosNoZoom, dataPointTopPosNoZoom;
+        private List<double> xTickXNoZoom = new List<double>(), 
+                            xTickLabelLeftNoZoom = new List<double>(), 
+                            yTickYNoZoom = new List<double>(), 
+                            yTickLabelTopNoZoom = new List<double>();
         private Criteria filterCriteria = new Criteria("49", "All Answers");
         Ellipse haloEllipse = new Ellipse();
         bool allowTagging = false;
         bool redrawPointsOnAxisChange = false;
-        bool redrawPointsOnXAxisZoom = false;
-        bool redrawPointsOnYAxisZoom = false;
+        bool redrawPointsOnXAxisZoom = false, redrawTicksOnXAxisZoom = false;
+        bool redrawPointsOnYAxisZoom = false,  redrawTicksOnYAxisZoom = false;
         bool showLogMsg = false;
 
         //Following variables are declared to avoid continuous calls to setAxis and DrawPoints
@@ -101,6 +105,7 @@ namespace TangibleAnchoring
             dataPointEllipses = new Ellipse[submissionData.Submissions.Length];
             dataPointLeftPosNoZoom = new Double[submissionData.Submissions.Length];
             dataPointTopPosNoZoom = new Double[submissionData.Submissions.Length];
+            
 
             xDomainStart = XAxis.X1;
             xDomainEnd = XAxis.X2;
@@ -154,7 +159,7 @@ namespace TangibleAnchoring
             // Initialize the YAxis
             SetYAxis(yAxisQuesId);
 
-            DrawPoints(1, 1);
+            DrawPoints();
             DrawXTicks();
             DrawYTicks();
         }
@@ -296,124 +301,243 @@ namespace TangibleAnchoring
             tickLabelColorBrush.Color = SurfaceColors.ControlBorderColor;
 
             qId = YAxis.Uid;
-            //Clear previous yTicks before starting afresh
-            foreach (string yTickKey in yTickLines.Keys)
+            if (!redrawTicksOnYAxisZoom)
             {
-                string index = yTickKey.Split('_')[1];
-                MainCanvas.Children.Remove(yTickLines[yTickKey]);
-                MainCanvas.Children.Remove(yTickLabels["YTickLabel_" + index]);
-            }
-            yTickLabels.Clear();
-            yTickLines.Clear();
 
-            Question ques = configData.FindQuestionFromId(qId);
-            if (ques.Answers != null)
-            {
-                int numAnswers = ques.Answers.Length;
-                double step = YAxisLength / numAnswers;
-                for (int index = 0; index < numAnswers; index++)
+                //Clear previous yTicks before starting afresh
+                foreach (string yTickKey in yTickLines.Keys)
                 {
-                    Line tick = new Line();
-                    tick.Name = "YTick_" + index;
-                    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
-                    tick.X1 = YAxis.X1 - 10.00;
-                    tick.Y1 = YAxis.Y1 + (numAnswers - index) * step;
-                    tick.X2 = YAxis.X1 + 10.00;
-                    tick.Y2 = tick.Y1;
-                    tick.StrokeThickness = 1;
-                    //MainCanvas.RegisterName(tick.Name, tick);
-                    MainCanvas.Children.Add(tick);
-
-
-                    TextBlock tLabel = new TextBlock();
-                    tLabel.Name = "YTickLabel_" + index;
-                    tLabel.Foreground = tickLabelColorBrush;
-                    tLabel.FontSize = 18;
-                    tLabel.Width = 80;
-                    tLabel.Text = ques.Answers[index].AnswerText;
-                    tLabel.TextWrapping = TextWrapping.WrapWithOverflow;
-
-                    //Next three lines allow rotation of tick labels
-                    //RotateTransform myTransform = new RotateTransform();
-                    //myTransform.Angle = -90;
-                    //tLabel.RenderTransform = myTransform;
-                    tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 80);
-                    tLabel.SetValue(Canvas.TopProperty, tick.Y1 - step / 2 - tLabel.FontSize);
-                    //MainCanvas.RegisterName(tLabel.Name, tLabel);
-                    MainCanvas.Children.Add(tLabel);
-
-                    yTickLines.Add(tick.Name, tick);
-                    yTickLabels.Add(tLabel.Name, tLabel);
+                    string index = yTickKey.Split('_')[1];
+                    MainCanvas.Children.Remove(yTickLines[yTickKey]);
+                    MainCanvas.Children.Remove(yTickLabels["YTickLabel_" + index]);
                 }
-            }
-            else if (ques.AnswerRange != null)
-            {
-                string[] answerRangeArr = ques.AnswerRange.Split(',');
-                //ASSUMPTION start and end value are integers only
-                int startValue = int.Parse(answerRangeArr[0]);
-                int endValue = int.Parse(answerRangeArr[1]);
-                int increment = int.Parse(answerRangeArr[2]);
-                int range = endValue - startValue;
+                yTickLabels.Clear();
+                yTickLines.Clear();
+                yTickLabelTopNoZoom.Clear();
+                yTickYNoZoom.Clear();
 
-                if (range <= 10)
+                Question ques = configData.FindQuestionFromId(qId);
+                if (ques.Answers != null)
                 {
-                    double step = YAxisLength / range;
-                    for (int index = startValue; index <= endValue; index++)
+                    int numAnswers = ques.Answers.Length;
+                    double step = YAxisLength / numAnswers;
+                    for (int index = 0; index < numAnswers; index++)
                     {
                         Line tick = new Line();
                         tick.Name = "YTick_" + index;
                         tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
                         tick.X1 = YAxis.X1 - 10.00;
-                        tick.Y1 = YAxis.Y1 + (endValue - index) * step;
+                        tick.Y1 = YAxis.Y1 + (numAnswers - index) * step;
                         tick.X2 = YAxis.X1 + 10.00;
                         tick.Y2 = tick.Y1;
                         tick.StrokeThickness = 1;
                         MainCanvas.Children.Add(tick);
-                        //MainCanvas.RegisterName(tick.Name, tick);
-
+                        
                         TextBlock tLabel = new TextBlock();
                         tLabel.Name = "YTickLabel_" + index;
                         tLabel.Foreground = tickLabelColorBrush;
                         tLabel.FontSize = 18;
-                        tLabel.Text = index.ToString();
-                        tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
-                        tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                        tLabel.Width = 80;
+                        tLabel.Text = ques.Answers[index].AnswerText;
+                        tLabel.TextWrapping = TextWrapping.WrapWithOverflow;
+
+                        //Next three lines allow rotation of tick labels
+                        //RotateTransform myTransform = new RotateTransform();
+                        //myTransform.Angle = -90;
+                        //tLabel.RenderTransform = myTransform;
+                        tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 80);
+                        tLabel.SetValue(Canvas.TopProperty, tick.Y1 - step / 2 - tLabel.FontSize);
                         MainCanvas.Children.Add(tLabel);
-                        // MainCanvas.RegisterName(tLabel.Name, tLabel);
+
+                        yTickYNoZoom.Add(tick.Y1);
+                        yTickLabelTopNoZoom.Add(tick.Y1 - step / 2 - tLabel.FontSize);
                         yTickLines.Add(tick.Name, tick);
                         yTickLabels.Add(tLabel.Name, tLabel);
                     }
                 }
-                else if (range > 10)
+                else if (ques.AnswerRange != null)
                 {
-                    double step = YAxisLength / 10;
-                    //TODO take into account the increment if it is different than 1
-                    for (int index = 0; index < 10; index++)
-                    {
-                        Line tick = new Line();
-                        tick.Name = "YTick_" + index;
-                        tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
-                        tick.X1 = YAxis.X1 - 10.00;
-                        tick.Y1 = YAxis.Y1 + (10 - index) * step;
-                        tick.X2 = YAxis.X1 + 10.00;
-                        tick.Y2 = tick.Y1;
-                        tick.StrokeThickness = 1;
-                        MainCanvas.Children.Add(tick);
-                        //MainCanvas.RegisterName(tick.Name, tick);
+                    string[] answerRangeArr = ques.AnswerRange.Split(',');
+                    //ASSUMPTION start and end value are integers only
+                    int startValue = int.Parse(answerRangeArr[0]);
+                    int endValue = int.Parse(answerRangeArr[1]);
+                    int increment = int.Parse(answerRangeArr[2]);
+                    int range = endValue - startValue;
 
-                        TextBlock tLabel = new TextBlock();
-                        tLabel.Name = "YTickLabel_" + index;
-                        tLabel.Foreground = tickLabelColorBrush;
-                        tLabel.FontSize = 18;
-                        tLabel.Text = ((range / 10.00) * index).ToString();
-                        tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
-                        tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
-                        MainCanvas.Children.Add(tLabel);
-                        //MainCanvas.RegisterName(tLabel.Name, tLabel);
-                        yTickLines.Add(tick.Name, tick);
-                        yTickLabels.Add(tLabel.Name, tLabel);
+                    if (range <= 10)
+                    {
+                        double step = YAxisLength / range;
+                        for (int index = startValue; index <= endValue; index++)
+                        {
+                            Line tick = new Line();
+                            tick.Name = "YTick_" + index;
+                            tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                            tick.X1 = YAxis.X1 - 10.00;
+                            tick.Y1 = YAxis.Y1 + (endValue - index) * step;
+                            tick.X2 = YAxis.X1 + 10.00;
+                            tick.Y2 = tick.Y1;
+                            tick.StrokeThickness = 1;
+                            MainCanvas.Children.Add(tick);
+                            //MainCanvas.RegisterName(tick.Name, tick);
+
+                            TextBlock tLabel = new TextBlock();
+                            tLabel.Name = "YTickLabel_" + index;
+                            tLabel.Foreground = tickLabelColorBrush;
+                            tLabel.FontSize = 18;
+                            tLabel.Text = index.ToString();
+                            tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
+                            tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                            MainCanvas.Children.Add(tLabel);
+                            // MainCanvas.RegisterName(tLabel.Name, tLabel);
+                            yTickYNoZoom.Add(tick.Y1);
+                            yTickLabelTopNoZoom.Add(tick.Y1 - 20);
+                            yTickLines.Add(tick.Name, tick);
+                            yTickLabels.Add(tLabel.Name, tLabel);
+                        }
+                    }
+                    else if (range > 10)
+                    {
+                        double step = YAxisLength / 10;
+                        //TODO take into account the increment if it is different than 1
+                        for (int index = 0; index < 10; index++)
+                        {
+                            Line tick = new Line();
+                            tick.Name = "YTick_" + index;
+                            tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                            tick.X1 = YAxis.X1 - 10.00;
+                            tick.Y1 = YAxis.Y1 + (10 - index) * step;
+                            tick.X2 = YAxis.X1 + 10.00;
+                            tick.Y2 = tick.Y1;
+                            tick.StrokeThickness = 1;
+                            MainCanvas.Children.Add(tick);
+
+                            TextBlock tLabel = new TextBlock();
+                            tLabel.Name = "YTickLabel_" + index;
+                            tLabel.Foreground = tickLabelColorBrush;
+                            tLabel.FontSize = 18;
+                            tLabel.Text = ((range / 10.00) * index).ToString();
+                            tLabel.SetValue(Canvas.LeftProperty, tick.X1 - 20);
+                            tLabel.SetValue(Canvas.TopProperty, tick.Y1 - 20);
+                            MainCanvas.Children.Add(tLabel);
+                            yTickYNoZoom.Add(tick.Y1);
+                            yTickLabelTopNoZoom.Add(tick.Y1 - 20);
+                            yTickLines.Add(tick.Name, tick);
+                            yTickLabels.Add(tLabel.Name, tLabel);
+                        }
                     }
                 }
+            }
+            else //redraw
+            {
+                Question ques = configData.FindQuestionFromId(qId);
+                double zoomFactor = YAxisLength / (yDomainStart - yDomainEnd);
+                double yStartShift = yRangeStart - yDomainStart;
+                double yEndShift = yDomainEnd - yRangeEnd;
+                if (ques.Answers != null)
+                {
+                    int numAnswers = ques.Answers.Length;
+                    double step = YAxisLength / numAnswers;
+                    for (int index = 0; index < numAnswers; index++)
+                    {
+                        string tickKey = "YTick_" + index;
+                        yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yEndShift)*zoomFactor;
+                        yTickLines[tickKey].Y2 = yTickLines[tickKey].Y1; 
+
+                        string tickLabelkey = "YTickLabel_" + index;
+                        double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yEndShift) * zoomFactor;
+                        yTickLabels[tickLabelkey].SetValue(Canvas.TopProperty, yTickLabelNewTop);
+                       
+
+                        if (yTickLines[tickKey].Y1 < yRangeEnd || yTickLines[tickKey].Y1 > yRangeStart)
+                        {
+                            yTickLines[tickKey].Visibility = System.Windows.Visibility.Hidden;
+                        }
+                        else { yTickLines[tickKey].Visibility = System.Windows.Visibility.Visible;}
+
+                        if (yTickLabelNewTop < yRangeEnd || yTickLabelNewTop > yRangeStart)
+                        {
+                            yTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Hidden;
+                        }
+                        else
+                        {
+                            yTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Visible;
+                        }
+                    }
+                }
+                else if (ques.AnswerRange != null)
+                {
+                    string[] answerRangeArr = ques.AnswerRange.Split(',');
+                    //ASSUMPTION start and end value are integers only
+                    int startValue = int.Parse(answerRangeArr[0]);
+                    int endValue = int.Parse(answerRangeArr[1]);
+                    int increment = int.Parse(answerRangeArr[2]);
+                    int range = endValue - startValue;
+
+                    if (range <= 10)
+                    {
+                        double step = YAxisLength / range;
+                        for (int index = startValue; index <= endValue; index++)
+                        {
+                            string tickKey = "YTick_" + index;
+                            yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yEndShift) * zoomFactor;
+                            yTickLines[tickKey].Y2 = yTickLines[tickKey].Y1;
+                            //MainCanvas.RegisterName(tick.Name, tick);
+
+                            string tickLabelkey = "YTickLabel_" + index;
+                            double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yEndShift) * zoomFactor;
+                            yTickLabels[tickLabelkey].SetValue(Canvas.TopProperty, yTickLabelNewTop);
+
+
+                            if (yTickLines[tickKey].Y1 < yRangeEnd || yTickLines[tickKey].Y1 > yRangeStart)
+                            {
+                                yTickLines[tickKey].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                            else { yTickLines[tickKey].Visibility = System.Windows.Visibility.Visible; }
+
+                            if (yTickLabelNewTop < yRangeEnd || yTickLabelNewTop > yRangeStart)
+                            {
+                                yTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                            else
+                            {
+                                yTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Visible;
+                            }
+                        }
+                    }
+                    else if (range > 10)
+                    {
+                        double step = YAxisLength / 10;
+                        //TODO take into account the increment if it is different than 1
+                        for (int index = 0; index < 10; index++)
+                        {
+                            string tickKey = "YTick_" + index;
+                            yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yEndShift) * zoomFactor;
+                            yTickLines[tickKey].Y2 = yTickLines[tickKey].Y1;
+                            //MainCanvas.RegisterName(tick.Name, tick);
+
+                            string tickLabelkey = "YTickLabel_" + index;
+                            double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yEndShift) * zoomFactor;
+                            yTickLabels[tickLabelkey].SetValue(Canvas.TopProperty, yTickLabelNewTop);
+
+
+                            if (yTickLines[tickKey].Y1 < yRangeEnd || yTickLines[tickKey].Y1 > yRangeStart)
+                            {
+                                yTickLines[tickKey].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                            else { yTickLines[tickKey].Visibility = System.Windows.Visibility.Visible; }
+
+                            if (yTickLabelNewTop < yRangeEnd || yTickLabelNewTop > yRangeStart)
+                            {
+                                yTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                            else
+                            {
+                                yTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Visible;
+                            }
+                        }
+                    }
+                }
+                redrawTicksOnYAxisZoom = false;
             }
         }
 
@@ -425,51 +549,97 @@ namespace TangibleAnchoring
             string qId;
             SolidColorBrush tickLabelColorBrush = new SolidColorBrush();
             tickLabelColorBrush.Color = SurfaceColors.ControlBorderColor;
-
-            //Clear previous xTicks before starting afresh
-            foreach (string xTickKey in xTickLines.Keys)
-            {
-                string index = xTickKey.Split('_')[1];
-                MainCanvas.Children.Remove(xTickLines[xTickKey]);
-                MainCanvas.Children.Remove(xTickLabels["XTickLabel_" + index]);
-            }
-            xTickLabels.Clear();
-            xTickLines.Clear();
-
             qId = XAxis.Uid;
-            Question ques = configData.FindQuestionFromId(qId);
-            int numAnswers = ques.Answers.Length;
-            double step = XAxisLength / numAnswers;
-            //Since we want to be able to spread the data points that align
-            // in a line for a value, the lowest value of XAxis will start from second tick
 
-            for (int index = 0; index < numAnswers; index++)
+            if (!redrawTicksOnXAxisZoom)
             {
+                //Clear previous xTicks before starting afresh
+                foreach (string xTickKey in xTickLines.Keys)
+                {
+                    string index = xTickKey.Split('_')[1];
+                    MainCanvas.Children.Remove(xTickLines[xTickKey]);
+                    MainCanvas.Children.Remove(xTickLabels["XTickLabel_" + index]);
+                }
+                xTickLabels.Clear();
+                xTickLines.Clear();
+                xTickLabelLeftNoZoom.Clear();
+                xTickXNoZoom.Clear();
 
-                Line tick = new Line();
-                tick.Name = "XTick_" + index;
-                tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
-                tick.X1 = XAxis.X1 + index * step;
-                tick.Y1 = XAxis.Y1 - 10.00;
-                tick.X2 = tick.X1;
-                tick.Y2 = XAxis.Y1 + 10.00;
-                tick.StrokeThickness = 1;
-                //MainCanvas.RegisterName(tick.Name, tick);
-                MainCanvas.Children.Add(tick);
+
+                Question ques = configData.FindQuestionFromId(qId);
+                int numAnswers = ques.Answers.Length;
+                double step = XAxisLength / numAnswers;
+                //Since we want to be able to spread the data points that align
+                // in a line for a value, the lowest value of XAxis will start from second tick
+
+                for (int index = 0; index < numAnswers; index++)
+                {
+
+                    Line tick = new Line();
+                    tick.Name = "XTick_" + index;
+                    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                    tick.X1 = XAxis.X1 + index * step;
+                    tick.Y1 = XAxis.Y1 - 10.00;
+                    tick.X2 = tick.X1;
+                    tick.Y2 = XAxis.Y1 + 10.00;
+                    tick.StrokeThickness = 1;
+                    //MainCanvas.RegisterName(tick.Name, tick);
+                    MainCanvas.Children.Add(tick);
 
 
-                TextBlock tLabel = new TextBlock();
-                tLabel.Name = "XTickLabel_" + index;
-                tLabel.Foreground = tickLabelColorBrush;
-                tLabel.FontSize = 18;
-                tLabel.Text = ques.Answers[index].AnswerText;
-                tLabel.SetValue(Canvas.LeftProperty, tick.X1 + step / 2 - (tLabel.Text.Length * (tLabel.FontSize * 0.75)) / 2);
-                tLabel.SetValue(Canvas.TopProperty, tick.Y1 + 20);
-                //MainCanvas.RegisterName(tLabel.Name, tLabel);
-                MainCanvas.Children.Add(tLabel);
+                    TextBlock tLabel = new TextBlock();
+                    tLabel.Name = "XTickLabel_" + index;
+                    tLabel.Foreground = tickLabelColorBrush;
+                    tLabel.FontSize = 18;
+                    tLabel.Text = ques.Answers[index].AnswerText;
+                    tLabel.SetValue(Canvas.LeftProperty, tick.X1 + step / 2 - (tLabel.Text.Length * (tLabel.FontSize * 0.75)) / 2);
+                    tLabel.SetValue(Canvas.TopProperty, tick.Y1 + 20);
+                    //MainCanvas.RegisterName(tLabel.Name, tLabel);
+                    MainCanvas.Children.Add(tLabel);
 
-                xTickLines.Add(tick.Name, tick);
-                xTickLabels.Add(tLabel.Name, tLabel);
+                    xTickXNoZoom.Add(tick.X1);
+                    xTickLabelLeftNoZoom.Add(tick.X1 - (tLabel.Text.Length * (tLabel.FontSize * 0.75)) / 2);
+                    xTickLines.Add(tick.Name, tick);
+                    xTickLabels.Add(tLabel.Name, tLabel);
+                }
+            }
+            else //redraw
+            {
+                Question ques = configData.FindQuestionFromId(qId);
+                int numAnswers = ques.Answers.Length;
+                double step = XAxisLength / numAnswers;
+                //Since we want to be able to spread the data points that align
+                // in a line for a value, the lowest value of XAxis will start from second tick
+                double zoomFactor = XAxisLength / (xDomainEnd - xDomainStart);
+                double xStartShift = xDomainStart - xRangeStart;
+                double xEndShift = xRangeEnd - xDomainEnd;
+
+                for (int index = 0; index < numAnswers; index++)
+                {
+                    string tickKey = "XTick_" + index;
+                    xTickLines[tickKey].X1 = (xTickXNoZoom[index] - xRangeStart) * zoomFactor - xStartShift * zoomFactor + xRangeStart;
+                    xTickLines[tickKey].X2 = xTickLines[tickKey].X1;
+
+                    string tickLabelkey = "XTickLabel_" + index;
+                    double xTickLabelNewLeft = (xTickXNoZoom[index] - xRangeStart) * zoomFactor - xStartShift * zoomFactor + xRangeStart + (step*zoomFactor)/2;
+                    xTickLabels[tickLabelkey].SetValue(Canvas.LeftProperty, xTickLabelNewLeft);
+
+                    if (xTickLines[tickKey].X1 < xRangeStart || xTickLines[tickKey].X1 > xRangeEnd)
+                    {
+                        xTickLines[tickKey].Visibility = System.Windows.Visibility.Hidden;
+                    }
+                    else { xTickLines[tickKey].Visibility = System.Windows.Visibility.Visible; }
+
+                    if (xTickLabelNewLeft < xRangeStart || xTickLabelNewLeft > xRangeEnd)
+                    {
+                        xTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Hidden;
+                    }
+                    else
+                    {
+                        xTickLabels[tickLabelkey].Visibility = System.Windows.Visibility.Visible;
+                    }
+                }
+                redrawTicksOnXAxisZoom = false;
             }
         }
 
@@ -477,8 +647,7 @@ namespace TangibleAnchoring
         /// Logic for drawing data points. It is dependant on current 
         /// question, current answer and the two axes.
         /// </summary>
-        /// <param name="submissionData">collection of points</param>
-        private void DrawPoints(int xAxisZoom, int yAxisZoom)
+        private void DrawPoints()
         {
             if (submissionData != null)
             {
@@ -493,7 +662,7 @@ namespace TangibleAnchoring
                         string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                         int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
                         //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                        int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                        int xTickInterval = (int)(XAxisLength / rangeXAxis);
                         double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
 
                         /******** Calculation for topPosition ********/
@@ -519,7 +688,7 @@ namespace TangibleAnchoring
                                 string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
                                 rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
                                 //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                                int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
+                                int yTickInterval = (int)(YAxisLength / rangeYAxis);
                                 topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10;
                                 break;
                         }
@@ -553,7 +722,7 @@ namespace TangibleAnchoring
                             string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                             int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
                             //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                            int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                            int xTickInterval = (int)(XAxisLength / rangeXAxis);
                             double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
 
 
@@ -577,7 +746,7 @@ namespace TangibleAnchoring
                                     string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
                                     rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
                                     //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                                    int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
+                                    int yTickInterval = (int)(YAxisLength / rangeYAxis);
                                     topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
                                     break;
                             }
@@ -588,7 +757,8 @@ namespace TangibleAnchoring
                         BackupDataPointPositions();
                         redrawPointsOnAxisChange = false;
                     }
-                    else if (redrawPointsOnXAxisZoom)
+                    
+                    if (redrawPointsOnXAxisZoom)
                     {
                         double zoomFactor = XAxisLength / (xDomainEnd - xDomainStart);
                         double xStartShift = xDomainStart - xRangeStart;
@@ -597,41 +767,17 @@ namespace TangibleAnchoring
                         {
                             double currentLeftPosition = dataPointLeftPosNoZoom[index];
                             double newLeftPosition = (currentLeftPosition - xRangeStart)* zoomFactor - xStartShift*zoomFactor + xRangeStart;
-                            //LogMsg("xDSt: " + xDomainStart +" zoom:"+zoomFactor);
-                            //LogMsg("XAxisEnd: " + (1900*zoomFactor - xStartShift*zoomFactor) + " XShift: "+xStartShift);
 
                             Submissions.Submission sData = submissionData.Submissions[index];
                             string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                             int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
                             //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                            int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                            int xTickInterval = (int)(XAxisLength / rangeXAxis);
                             //double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
 
 
                            
                             double currentTopPosition = dataPointTopPosNoZoom[index];
-                            //switch (quesIdForYAxis)
-                            //{
-                            //    case "4": //Age
-                            //        string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
-                            //        rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
-                            //        //For general case use the answerId found in next statement to find the x,y position
-                            //        //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                            //        //For Age, get direct value of age from sData
-                            //        int answerValue = sData.Age;
-
-                            //       // topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
-
-                            //        break;
-                            //    case "5": //Obama or Romney
-
-                            //        string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                            //        rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
-                            //        //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                            //        int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
-                            //        //topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
-                            //        break;
-                            //}
                             dataPointEllipses[index].SetValue(Canvas.LeftProperty, newLeftPosition);
                             dataPointEllipses[index].SetValue(Canvas.TopProperty, currentTopPosition);
                             if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
@@ -645,7 +791,8 @@ namespace TangibleAnchoring
                         }
                         redrawPointsOnXAxisZoom = false;
                     }
-                    else if (redrawPointsOnYAxisZoom)
+                    
+                    if (redrawPointsOnYAxisZoom)
                     {
                         double zoomFactor = YAxisLength / (yDomainStart - yDomainEnd);
                         double yStartShift = yRangeStart - yDomainStart;
@@ -653,41 +800,18 @@ namespace TangibleAnchoring
                         for (int index = 0; index < numPoints; index++)
                         {
                             double currentLeftPosition = dataPointLeftPosNoZoom[index];
-                            //double newLeftPosition = (currentLeftPosition - 160) * zoomFactor - xStartShift * zoomFactor + 160;
-                            //LogMsg("xDSt: " + xDomainStart +" zoom:"+zoomFactor);
-                            //LogMsg("XAxisEnd: " + (1900*zoomFactor - xStartShift*zoomFactor) + " XShift: "+xStartShift);
-
                             Submissions.Submission sData = submissionData.Submissions[index];
-                            string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
-                            int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
-                            //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                            int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
-                            //double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
-
 
                             string quesIdForYAxis = YAxis.Uid;
-                            double topPosition = 0.0, rangeYAxis = 0.0;
                             double currentTopPosition = dataPointTopPosNoZoom[index];
                             double newTopPosition = 0.0;
                             switch (quesIdForYAxis)
                             {
                                 case "4": //Age
-                                    string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
-                                    rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
-                                    //For general case use the answerId found in next statement to find the x,y position
-                                    //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                                    //For Age, get direct value of age from sData
-                                    int answerValue = sData.Age;
-                                    newTopPosition = (currentTopPosition - yEndShift)*zoomFactor;
+                                    newTopPosition = (currentTopPosition - yEndShift) * zoomFactor - yRangeEnd * zoomFactor + yRangeEnd;
                                     //topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
-
                                     break;
                                 case "5": //Obama or Romney
-
-                                    string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
-                                    rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
-                                    //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
-                                    int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
                                     newTopPosition = (currentTopPosition - yEndShift) * zoomFactor;
                                     //topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
                                     break;
@@ -1144,13 +1268,13 @@ namespace TangibleAnchoring
             RotateTransform myRotateTransform = new RotateTransform();
             myRotateTransform.Angle = tOrientation;
  
-            VizOperationReset();
+            
             switch (tangibleViz.VisualizedTag.Value)
             {
                 case 222: //Viewpoint Republican
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
 
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("222").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
@@ -1165,11 +1289,12 @@ namespace TangibleAnchoring
                             prevRepViewPtFacetIndex = facetIndex;
                         }
                     }
+                    VizOperationReset();
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
 
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("210").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
@@ -1184,10 +1309,11 @@ namespace TangibleAnchoring
                             prevIndViewPtFacetIndex = facetIndex;
                         }
                     }
+                    VizOperationReset();
                     break;
                 case 212: //Viewpoint Democrat
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("212").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
@@ -1202,10 +1328,11 @@ namespace TangibleAnchoring
                             prevDemViewPtFacetIndex = facetIndex;
                         }
                     }
+                    VizOperationReset();
                     break;
                 case 208: //Question Changer
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("208").Name;
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("208").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
@@ -1224,7 +1351,7 @@ namespace TangibleAnchoring
                     break;
                 case 213: //Answer Changer
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("213").Name;
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         //In case of answer changer tangible the Facet list has been left blank because it depends on the question id
                         int numFacets = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers.Length + 1; //+1 for adding the case in which all answers appear
@@ -1247,14 +1374,14 @@ namespace TangibleAnchoring
                         }
 
                     }
+                    VizOperationReset();
                     break;
                 case 214: //XAxisStarter
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("214").Name;
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("214").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
-                        //TODO Throws exception every now and then
                         string facetQuestionId = configData.FindTangibleFromId("214").Rotation[facetIndex].QuestionId;
                         string facetAnswerIds = configData.FindTangibleFromId("214").Rotation[facetIndex].AnswerIds;
 
@@ -1263,7 +1390,8 @@ namespace TangibleAnchoring
                             SetXAxis(facetQuestionId);
                             redrawPointsOnAxisChange = true;
                             DrawXTicks();
-                            DrawPoints(1, 1);
+                            VizOperationReset();
+                            DrawPoints();
                             prevXMinFacetIndex = facetIndex;
                         }
                     }
@@ -1280,7 +1408,10 @@ namespace TangibleAnchoring
                     if (Math.Abs(prevXDomainStart - xDomainStart) >= axisChangeTolerance)
                     {
                         redrawPointsOnXAxisZoom = true;
-                        DrawPoints(1, 1);
+                        redrawTicksOnXAxisZoom = true;
+                        VizOperationReset();
+                        DrawPoints();
+                        DrawXTicks();
                     }
                     //UpdateXDomainLength();
                     break;
@@ -1297,11 +1428,14 @@ namespace TangibleAnchoring
                     if (Math.Abs(prevXDomainEnd - xDomainEnd) >= axisChangeTolerance)
                     {
                         redrawPointsOnXAxisZoom = true;
-                        DrawPoints(1, 1);
+                        redrawTicksOnXAxisZoom = true;
+                        VizOperationReset();
+                        DrawPoints();
+                        DrawXTicks();
                     }
                     break;
                 case 211: //YAxisStarter
-                    if (tOrientation >= 0 && tOrientation <= 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
                     {
                         int numFacets = configData.FindTangibleFromId("211").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
@@ -1313,7 +1447,8 @@ namespace TangibleAnchoring
                             SetYAxis(facetQuestionId);
                             redrawPointsOnAxisChange = true;
                             DrawYTicks();
-                            DrawPoints(1, 1);
+                            VizOperationReset();
+                            DrawPoints();
                             prevYMinFacetIndex = facetIndex;
                         }
                     }
@@ -1330,7 +1465,10 @@ namespace TangibleAnchoring
                     if (Math.Abs(prevYDomainStart - yDomainStart) >= axisChangeTolerance)
                     {
                         redrawPointsOnYAxisZoom = true;
-                        DrawPoints(1, 1);
+                        redrawTicksOnYAxisZoom = true;
+                        VizOperationReset();
+                        DrawPoints();
+                        DrawYTicks();
                     }
                     break;
                 case 215: //YAxisEnd
@@ -1347,7 +1485,10 @@ namespace TangibleAnchoring
                     if (Math.Abs(prevYDomainEnd - yDomainEnd) >= axisChangeTolerance)
                     {
                         redrawPointsOnYAxisZoom = true;
-                        DrawPoints(1, 1);
+                        redrawTicksOnYAxisZoom = true;
+                        VizOperationReset();
+                        DrawPoints();
+                        DrawYTicks();
                     }
                     break;
                 case 223: //Tagger
@@ -1392,25 +1533,33 @@ namespace TangibleAnchoring
                     prevXDomainStart = xDomainStart;
                     xDomainStart = xRangeStart;
                     redrawPointsOnXAxisZoom = true;
-                    DrawPoints(1, 1);
+                    redrawTicksOnXAxisZoom = true;
+                    DrawPoints();
+                    DrawXTicks();
                     break;
                 case 209: //XAxisEnd
                     prevXDomainEnd = xDomainEnd;
                     xDomainEnd = xRangeEnd;
                     redrawPointsOnXAxisZoom = true;
-                    DrawPoints(1, 1);
+                    redrawTicksOnXAxisZoom = true;
+                    DrawPoints();
+                    DrawXTicks();
                     break;
                 case 211: //YAxisStarter
                     prevYDomainStart = yDomainStart;
                     yDomainStart = yRangeStart;
                     redrawPointsOnYAxisZoom = true;
-                    DrawPoints(1, 1);
+                    redrawTicksOnYAxisZoom = true;
+                    DrawPoints();
+                    DrawYTicks();
                     break;
                 case 215: //YAxisEnd
                     prevYDomainEnd = yDomainEnd;
                     yDomainEnd = yRangeEnd;
                     redrawPointsOnYAxisZoom = true;
-                    DrawPoints(1, 1);
+                    redrawTicksOnYAxisZoom = true;
+                    DrawPoints();
+                    DrawYTicks();
                     break;
                 case 223: //Tagger
                     allowTagging = false;
