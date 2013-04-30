@@ -32,6 +32,7 @@ namespace TangibleAnchoring
         bool redrawPointsOnAxisChange = false;
         bool redrawPointsOnXAxisZoom = false;
         bool redrawPointsOnYAxisZoom = false;
+        bool showLogMsg = false;
 
         //Following variables are declared to avoid continuous calls to setAxis and DrawPoints
         int prevXMinFacetIndex = 0,
@@ -123,6 +124,17 @@ namespace TangibleAnchoring
             proposedXAxisLength = XAxisLength;
             proposedYAxisLength = YAxisLength;
 
+            if (showLogMsg)
+            {
+                LogMessageLabel.Visibility = System.Windows.Visibility.Visible;
+                TangibleSelection.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else 
+            {
+                LogMessageLabel.Visibility = System.Windows.Visibility.Collapsed;
+                TangibleSelection.Visibility = System.Windows.Visibility.Visible;
+            }
+
             InitScatterplot("88", "All Answers", "46", "4");
         }
 
@@ -155,6 +167,15 @@ namespace TangibleAnchoring
         private void LogMsg(string message)
         {
             LogMessageLabel.Content = message;
+        }
+
+        /// <summary>
+        /// Shows a log message on the top left.
+        /// </summary>
+        /// <param name="message">string message</param>
+        private void TangibleSelectionMessage(string message)
+        {
+            TangibleSelection.Content = message;
         }
 
         /// <summary>
@@ -1122,14 +1143,7 @@ namespace TangibleAnchoring
             tY = tangibleViz.Center.Y;
             RotateTransform myRotateTransform = new RotateTransform();
             myRotateTransform.Angle = tOrientation;
-            //tOrientation = (tOrientation == 0.0) ? 360.00 : tOrientation;
-            //if (tOrientation < 0)
-            //{
-            //    tOrientation += 360.00;  
-            //}
-
-            
-
+ 
             VizOperationReset();
             switch (tangibleViz.VisualizedTag.Value)
             {
@@ -1141,10 +1155,13 @@ namespace TangibleAnchoring
                         int numFacets = configData.FindTangibleFromId("222").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetAnswerIds = configData.FindTangibleFromId("222").Rotation[facetIndex].AnswerIds;
+                        string facetLabel = configData.FindTangibleFromId("222").Rotation[facetIndex].Label;
+                        TangibleSelectionMessage(facetLabel);
                         if (prevRepViewPtFacetIndex != facetIndex)
                         {
                             filterCriteria.RemoveIds("49", "6,7");
                             filterCriteria.AddIds("49", facetAnswerIds);
+                            
                             prevRepViewPtFacetIndex = facetIndex;
                         }
                     }
@@ -1157,10 +1174,13 @@ namespace TangibleAnchoring
                         int numFacets = configData.FindTangibleFromId("210").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetAnswerIds = configData.FindTangibleFromId("210").Rotation[facetIndex].AnswerIds;
+                        string facetLabel = configData.FindTangibleFromId("210").Rotation[facetIndex].Label;
+                        TangibleSelectionMessage(facetLabel);
                         if (prevIndViewPtFacetIndex != facetIndex)
                         {
                             filterCriteria.RemoveIds("49", "3,4,5");
                             filterCriteria.AddIds("49", facetAnswerIds);
+                            
                             prevIndViewPtFacetIndex = facetIndex;
                         }
                     }
@@ -1172,10 +1192,13 @@ namespace TangibleAnchoring
                         int numFacets = configData.FindTangibleFromId("212").Rotation.Length;
                         int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
                         string facetAnswerIds = configData.FindTangibleFromId("212").Rotation[facetIndex].AnswerIds;
+                        string facetLabel = configData.FindTangibleFromId("212").Rotation[facetIndex].Label;
+                        TangibleSelectionMessage(facetLabel);
                         if (prevDemViewPtFacetIndex != facetIndex)
                         {
                             filterCriteria.RemoveIds("49", "1,2");
                             filterCriteria.AddIds("49", facetAnswerIds);
+                            
                             prevDemViewPtFacetIndex = facetIndex;
                         }
                     }

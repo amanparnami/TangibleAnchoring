@@ -20,6 +20,13 @@
                Grid.Column="0"
                VerticalAlignment="Center"
                HorizontalAlignment="Center"/>
+        <Label x:Name="TangibleSelection" 
+               Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}"     
+               Grid.Row="0"
+               Grid.Column="0"
+               FontSize="24"
+               VerticalAlignment="Center"
+               HorizontalAlignment="Center"/>
         <Label x:Name="CurrentQuestion" 
                Foreground="{DynamicResource {x:Static s:SurfaceColors.ControlBorderBrushKey}}" 
                FontSize="48"
