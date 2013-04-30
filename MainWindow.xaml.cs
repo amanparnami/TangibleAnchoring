@@ -575,7 +575,64 @@ namespace TangibleAnchoring
                         for (int index = 0; index < numPoints; index++)
                         {
                             double currentLeftPosition = dataPointLeftPosNoZoom[index];
-                            double newLeftPosition = (currentLeftPosition - 160)* zoomFactor - xStartShift*zoomFactor + 160;
+                            double newLeftPosition = (currentLeftPosition - xRangeStart)* zoomFactor - xStartShift*zoomFactor + xRangeStart;
+                            //LogMsg("xDSt: " + xDomainStart +" zoom:"+zoomFactor);
+                            //LogMsg("XAxisEnd: " + (1900*zoomFactor - xStartShift*zoomFactor) + " XShift: "+xStartShift);
+
+                            Submissions.Submission sData = submissionData.Submissions[index];
+                            string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
+                            int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
+                            //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                            int xTickInterval = (int)(XAxisLength / rangeXAxis) * xAxisZoom;
+                            //double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
+
+
+                           
+                            double currentTopPosition = dataPointTopPosNoZoom[index];
+                            //switch (quesIdForYAxis)
+                            //{
+                            //    case "4": //Age
+                            //        string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
+                            //        rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
+                            //        //For general case use the answerId found in next statement to find the x,y position
+                            //        //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                            //        //For Age, get direct value of age from sData
+                            //        int answerValue = sData.Age;
+
+                            //       // topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+
+                            //        break;
+                            //    case "5": //Obama or Romney
+
+                            //        string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
+                            //        rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
+                            //        //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                            //        int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
+                            //        //topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
+                            //        break;
+                            //}
+                            dataPointEllipses[index].SetValue(Canvas.LeftProperty, newLeftPosition);
+                            dataPointEllipses[index].SetValue(Canvas.TopProperty, currentTopPosition);
+                            if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
+                            {
+                                dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                            if (currentTopPosition < yRangeEnd || currentTopPosition >= yRangeStart)
+                            {
+                                dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                        }
+                        redrawPointsOnXAxisZoom = false;
+                    }
+                    else if (redrawPointsOnYAxisZoom)
+                    {
+                        double zoomFactor = YAxisLength / (yDomainStart - yDomainEnd);
+                        double yStartShift = yRangeStart - yDomainStart;
+                        double yEndShift = yDomainEnd - yRangeEnd;
+                        for (int index = 0; index < numPoints; index++)
+                        {
+                            double currentLeftPosition = dataPointLeftPosNoZoom[index];
+                            //double newLeftPosition = (currentLeftPosition - 160) * zoomFactor - xStartShift * zoomFactor + 160;
                             //LogMsg("xDSt: " + xDomainStart +" zoom:"+zoomFactor);
                             //LogMsg("XAxisEnd: " + (1900*zoomFactor - xStartShift*zoomFactor) + " XShift: "+xStartShift);
 
@@ -589,6 +646,8 @@ namespace TangibleAnchoring
 
                             string quesIdForYAxis = YAxis.Uid;
                             double topPosition = 0.0, rangeYAxis = 0.0;
+                            double currentTopPosition = dataPointTopPosNoZoom[index];
+                            double newTopPosition = 0.0;
                             switch (quesIdForYAxis)
                             {
                                 case "4": //Age
@@ -598,8 +657,8 @@ namespace TangibleAnchoring
                                     //string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
                                     //For Age, get direct value of age from sData
                                     int answerValue = sData.Age;
-
-                                    topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
+                                    newTopPosition = (currentTopPosition - yEndShift)*zoomFactor;
+                                    //topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
 
                                     break;
                                 case "5": //Obama or Romney
@@ -608,20 +667,22 @@ namespace TangibleAnchoring
                                     rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
                                     //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
                                     int yTickInterval = (int)(YAxisLength / rangeYAxis) * yAxisZoom;
-                                    topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
+                                    newTopPosition = (currentTopPosition - yEndShift) * zoomFactor;
+                                    //topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
                                     break;
                             }
-                            dataPointEllipses[index].SetValue(Canvas.LeftProperty, newLeftPosition);
-                            dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
-                            if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
+                            dataPointEllipses[index].SetValue(Canvas.LeftProperty, currentLeftPosition);
+                            dataPointEllipses[index].SetValue(Canvas.TopProperty, newTopPosition);
+                            if (currentLeftPosition < xRangeStart || currentLeftPosition >= xRangeEnd)
                             {
                                 dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
-                            } 
+                            }
+
+                            if (newTopPosition < yRangeEnd || newTopPosition >= yRangeStart)
+                            {
+                                dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                            }
                         }
-                        redrawPointsOnXAxisZoom = false;
-                    }
-                    else if (redrawPointsOnYAxisZoom)
-                    {
                         redrawPointsOnYAxisZoom = false;
                     }
 
@@ -1022,6 +1083,15 @@ namespace TangibleAnchoring
                     tangibleViz.TangibleInfo.Content = "Ymin";
                     tangibleViz.myArrow.Stroke = SurfaceColors.ControlAccentBrush;
                     tangibleViz.myEllipse.Stroke = SurfaceColors.ControlAccentBrush;
+                    if (tY >= xRangeStart)
+                    {
+                        xDomainStart = xRangeStart;
+                    }
+                    else 
+                    {
+                        xDomainStart = tY;
+                    }
+                    UpdateYDomainLength();
                     break;
                 case 215: //YAxisEnd
                     tangibleViz.TangibleInfo.Content = "Ymax";
@@ -1224,8 +1294,38 @@ namespace TangibleAnchoring
                             prevYMinFacetIndex = facetIndex;
                         }
                     }
+                     prevYDomainStart = yDomainStart;
+                    if (tY <= yRangeStart)
+                    {
+                        yDomainStart = tY;  
+                    }
+                    else 
+                    {
+                        yDomainStart = yRangeStart;
+                    }
+
+                    if (Math.Abs(prevYDomainStart - yDomainStart) >= axisChangeTolerance)
+                    {
+                        redrawPointsOnYAxisZoom = true;
+                        DrawPoints(1, 1);
+                    }
                     break;
                 case 215: //YAxisEnd
+                     prevYDomainEnd = yDomainEnd;
+                    if (tY >= yRangeEnd)
+                    {
+                        yDomainEnd = tY;
+                    }
+                    else 
+                    {
+                        yDomainEnd = yRangeEnd;
+                    }
+
+                    if (Math.Abs(prevYDomainEnd - yDomainEnd) >= axisChangeTolerance)
+                    {
+                        redrawPointsOnYAxisZoom = true;
+                        DrawPoints(1, 1);
+                    }
                     break;
                 case 223: //Tagger
                     break;
@@ -1278,18 +1378,26 @@ namespace TangibleAnchoring
                     DrawPoints(1, 1);
                     break;
                 case 211: //YAxisStarter
+                    prevYDomainStart = yDomainStart;
+                    yDomainStart = yRangeStart;
+                    redrawPointsOnYAxisZoom = true;
+                    DrawPoints(1, 1);
                     break;
                 case 215: //YAxisEnd
+                    prevYDomainEnd = yDomainEnd;
+                    yDomainEnd = yRangeEnd;
+                    redrawPointsOnYAxisZoom = true;
+                    DrawPoints(1, 1);
                     break;
                 case 223: //Tagger
                     allowTagging = false;
 
                     //Remove the ellipses from MainCanvas and clear the taggedEllipses list
-                    foreach (string tagKey in taggedEllipses.Keys)
-                    {
-                        MainCanvas.Children.Remove(taggedEllipses[tagKey]);
-                    }
-                    taggedEllipses.Clear();
+                    //foreach (string tagKey in taggedEllipses.Keys)
+                    //{
+                    //    MainCanvas.Children.Remove(taggedEllipses[tagKey]);
+                    //}
+                    //taggedEllipses.Clear();
                     break;
             }
             LogMsg(filterCriteria.ToLogString());

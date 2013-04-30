@@ -62,7 +62,7 @@
                       StrokeThickness="1"
                       X1 = "160"
             Y1 = "920"
-            X2 = "1900"
+            X2 = "1800"
             Y2 = "920" 
              />
 
@@ -81,7 +81,7 @@
                       Stroke = "DarkSlateGray"
                       StrokeThickness="1"
                       X1 = "160"
-            Y1 = "80"
+            Y1 = "120"
             X2 = "160"
             Y2 = "920" />
                 
