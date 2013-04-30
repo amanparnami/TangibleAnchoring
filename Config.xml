@@ -52,14 +52,14 @@
         </Facet>
         <Facet>
           <Type>single</Type>
-          <Label>Strong Republican</Label>
+          <Label>Republican</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>6</AnswerIds>
           <Color>227,6,19</Color>
         </Facet>
         <Facet>
           <Type>single</Type>
-          <Label>Republican</Label>
+          <Label>Strong Republican</Label>
           <QuestionId>49</QuestionId>
           <AnswerIds>7</AnswerIds>
           <Color>227,6,1</Color>
