@@ -445,11 +445,11 @@ namespace TangibleAnchoring
                     for (int index = 0; index < numAnswers; index++)
                     {
                         string tickKey = "YTick_" + index;
-                        yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yEndShift)*zoomFactor;
+                        yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                         yTickLines[tickKey].Y2 = yTickLines[tickKey].Y1; 
 
                         string tickLabelkey = "YTickLabel_" + index;
-                        double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yEndShift) * zoomFactor;
+                        double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                         yTickLabels[tickLabelkey].SetValue(Canvas.TopProperty, yTickLabelNewTop);
                        
 
@@ -484,12 +484,12 @@ namespace TangibleAnchoring
                         for (int index = startValue; index <= endValue; index++)
                         {
                             string tickKey = "YTick_" + index;
-                            yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yEndShift) * zoomFactor;
+                            yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                             yTickLines[tickKey].Y2 = yTickLines[tickKey].Y1;
                             //MainCanvas.RegisterName(tick.Name, tick);
 
                             string tickLabelkey = "YTickLabel_" + index;
-                            double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yEndShift) * zoomFactor;
+                            double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                             yTickLabels[tickLabelkey].SetValue(Canvas.TopProperty, yTickLabelNewTop);
 
 
@@ -516,12 +516,12 @@ namespace TangibleAnchoring
                         for (int index = 0; index < 10; index++)
                         {
                             string tickKey = "YTick_" + index;
-                            yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yEndShift) * zoomFactor;
+                            yTickLines[tickKey].Y1 = (yTickYNoZoom[index] - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                             yTickLines[tickKey].Y2 = yTickLines[tickKey].Y1;
                             //MainCanvas.RegisterName(tick.Name, tick);
 
                             string tickLabelkey = "YTickLabel_" + index;
-                            double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yEndShift) * zoomFactor;
+                            double yTickLabelNewTop = (yTickLabelTopNoZoom[index] - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd; 
                             yTickLabels[tickLabelkey].SetValue(Canvas.TopProperty, yTickLabelNewTop);
 
 
@@ -721,6 +721,12 @@ namespace TangibleAnchoring
                 {
                     if (redrawPointsOnAxisChange)
                     {
+                        double xZoomFactor = XAxisLength / (xDomainEnd - xDomainStart);
+                        double xStartShift = xDomainStart - xRangeStart;
+                        double xEndShift = xRangeEnd - xDomainEnd;
+                        double yZoomFactor = YAxisLength / (yDomainStart - yDomainEnd);
+                        double yStartShift = yRangeStart - yDomainStart;
+                        double yEndShift = yDomainEnd - yRangeEnd;
                         for (int index = 0; index < numPoints; index++)
                         {
                             Submissions.Submission sData = submissionData.Submissions[index];
@@ -729,7 +735,7 @@ namespace TangibleAnchoring
                             //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
                             int xTickInterval = (int)(XAxisLength / rangeXAxis);
                             double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
-
+                            leftPosition = (leftPosition - xRangeStart) * xZoomFactor - xStartShift * xZoomFactor + xRangeStart;
 
                             string quesIdForYAxis = YAxis.Uid;
                             double topPosition = 0.0, rangeYAxis = 0.0;
@@ -756,6 +762,7 @@ namespace TangibleAnchoring
                                     break;
                             }
 
+                            topPosition = (topPosition - yRangeEnd) * yZoomFactor - yEndShift * yZoomFactor + yRangeEnd;
                             if (taggedEllipses.ContainsKey("tag_" + index))
                             {
                                 taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, leftPosition - DataPointWidth/4);
@@ -765,6 +772,23 @@ namespace TangibleAnchoring
                             dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
                             dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
 
+                            if (leftPosition < xRangeStart || leftPosition >= xRangeEnd)
+                            {
+                                dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                                if (taggedEllipses.ContainsKey("tag_" + index))
+                                {
+                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                                }
+                            }
+
+                            if (topPosition < yRangeEnd || topPosition >= yRangeStart)
+                            {
+                                dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                                if (taggedEllipses.ContainsKey("tag_" + index))
+                                {
+                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                                }
+                            }
                         }
                         BackupDataPointPositions();
                         redrawPointsOnAxisChange = false;
@@ -789,9 +813,9 @@ namespace TangibleAnchoring
 
 
                            
-                            double currentTopPosition = dataPointTopPosNoZoom[index];
+                            double currentTopPosition = (double) dataPointEllipses[index].GetValue(Canvas.TopProperty) ;
                             dataPointEllipses[index].SetValue(Canvas.LeftProperty, newLeftPosition);
-                            dataPointEllipses[index].SetValue(Canvas.TopProperty, currentTopPosition);
+                           // dataPointEllipses[index].SetValue(Canvas.TopProperty, currentTopPosition);
 
                             if (taggedEllipses.ContainsKey("tag_" + index))
                             {
@@ -826,7 +850,7 @@ namespace TangibleAnchoring
                         double yEndShift = yDomainEnd - yRangeEnd;
                         for (int index = 0; index < numPoints; index++)
                         {
-                            double currentLeftPosition = dataPointLeftPosNoZoom[index];
+                            
                             Submissions.Submission sData = submissionData.Submissions[index];
 
                             string quesIdForYAxis = YAxis.Uid;
@@ -835,15 +859,15 @@ namespace TangibleAnchoring
                             switch (quesIdForYAxis)
                             {
                                 case "4": //Age
-                                    newTopPosition = (currentTopPosition - yEndShift) * zoomFactor - yRangeEnd * zoomFactor + yRangeEnd;
+                                    newTopPosition = (currentTopPosition - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                                     //topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
                                     break;
                                 case "5": //Obama or Romney
-                                    newTopPosition = (currentTopPosition - yEndShift) * zoomFactor;
+                                    newTopPosition = (currentTopPosition - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                                     //topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
                                     break;
                             }
-                            dataPointEllipses[index].SetValue(Canvas.LeftProperty, currentLeftPosition);
+                            double currentLeftPosition = (double) dataPointEllipses[index].GetValue(Canvas.LeftProperty);
                             dataPointEllipses[index].SetValue(Canvas.TopProperty, newTopPosition);
 
                             if (taggedEllipses.ContainsKey("tag_" + index))
