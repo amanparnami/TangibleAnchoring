@@ -33,6 +33,7 @@ namespace TangibleAnchoring
         private Criteria filterCriteria = new Criteria("49", "All Answers");
         Ellipse haloEllipse = new Ellipse();
         bool allowTagging = false;
+        bool showTaggedDataPointsOnly = false;
         bool redrawPointsOnAxisChange = false;
         bool redrawPointsOnXAxisZoom = false, redrawTicksOnXAxisZoom = false;
         bool redrawPointsOnYAxisZoom = false,  redrawTicksOnYAxisZoom = false;
@@ -58,6 +59,10 @@ namespace TangibleAnchoring
         Dictionary<string, TextBlock> xTickLabels = new Dictionary<string, TextBlock>();
         Dictionary<string, Line> yTickLines = new Dictionary<string, Line>();
         Dictionary<string, TextBlock> yTickLabels = new Dictionary<string, TextBlock>();
+        List<string> tangiblesOnTable = new List<string>();
+
+        double DataPointWidth = 20.0;
+        double DataPointHeight = 20.0;
 
         SolidColorBrush[] viewpointColors = {
                                                 (SolidColorBrush)(new BrushConverter().ConvertFrom("#0171d0")),
@@ -653,7 +658,7 @@ namespace TangibleAnchoring
             {
                 int numPoints = submissionData.Submissions.Length;
                 Random r = new Random();
-                if (!redrawPointsOnAxisChange && !redrawPointsOnXAxisZoom && !redrawPointsOnYAxisZoom) //first time draw
+                if (!redrawPointsOnAxisChange && !redrawPointsOnXAxisZoom && !redrawPointsOnYAxisZoom && !allowTagging && !showTaggedDataPointsOnly) //first time draw
                 {
                     for (int index = 0; index < numPoints; index++)
                     {
@@ -701,8 +706,8 @@ namespace TangibleAnchoring
                         //Dynamic assignment of touch event handler
                         dataPointEllipses[index].TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
                         dataPointEllipses[index].TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
-                        dataPointEllipses[index].Height = 20;
-                        dataPointEllipses[index].Width = 20;
+                        dataPointEllipses[index].Height = DataPointHeight;
+                        dataPointEllipses[index].Width = DataPointWidth;
 
                         // AnswerId - 1 because viewpoints are numbered from 1..7 
                         dataPointEllipses[index].Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
@@ -750,6 +755,13 @@ namespace TangibleAnchoring
                                     topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
                                     break;
                             }
+
+                            if (taggedEllipses.ContainsKey("tag_" + index))
+                            {
+                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, leftPosition - DataPointWidth/4);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, topPosition - DataPointHeight/4);
+                            }
+
                             dataPointEllipses[index].SetValue(Canvas.LeftProperty, leftPosition);
                             dataPointEllipses[index].SetValue(Canvas.TopProperty, topPosition);
 
@@ -780,13 +792,28 @@ namespace TangibleAnchoring
                             double currentTopPosition = dataPointTopPosNoZoom[index];
                             dataPointEllipses[index].SetValue(Canvas.LeftProperty, newLeftPosition);
                             dataPointEllipses[index].SetValue(Canvas.TopProperty, currentTopPosition);
+
+                            if (taggedEllipses.ContainsKey("tag_" + index))
+                            {
+                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, newLeftPosition - DataPointWidth / 4);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, currentTopPosition - DataPointHeight / 4);
+                            }
+
                             if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
                             {
                                 dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                                if (taggedEllipses.ContainsKey("tag_" + index))
+                                {
+                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                                }
                             }
                             if (currentTopPosition < yRangeEnd || currentTopPosition >= yRangeStart)
                             {
                                 dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                                if (taggedEllipses.ContainsKey("tag_" + index))
+                                {
+                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                                }
                             }
                         }
                         redrawPointsOnXAxisZoom = false;
@@ -818,20 +845,44 @@ namespace TangibleAnchoring
                             }
                             dataPointEllipses[index].SetValue(Canvas.LeftProperty, currentLeftPosition);
                             dataPointEllipses[index].SetValue(Canvas.TopProperty, newTopPosition);
+
+                            if (taggedEllipses.ContainsKey("tag_" + index))
+                            {
+                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, currentLeftPosition - DataPointWidth / 4);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, newTopPosition - DataPointHeight / 4);
+                            }
+
                             if (currentLeftPosition < xRangeStart || currentLeftPosition >= xRangeEnd)
                             {
                                 dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                                if (taggedEllipses.ContainsKey("tag_" + index))
+                                {
+                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                                }
                             }
 
                             if (newTopPosition < yRangeEnd || newTopPosition >= yRangeStart)
                             {
                                 dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                                if (taggedEllipses.ContainsKey("tag_" + index))
+                                {
+                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                                }
                             }
                         }
                         redrawPointsOnYAxisZoom = false;
                     }
 
-                    
+                    if (showTaggedDataPointsOnly)
+                    {
+                        for (int index = 0; index < numPoints; index++)
+                        {
+                            if (!taggedEllipses.ContainsKey("tag_" + index)) //the data point at index is not tagged
+                            {
+                                dataPointEllipses[index].Visibility = System.Windows.Visibility.Hidden;
+                            }
+                        }
+                    }
                 }
                 
             }
@@ -876,7 +927,12 @@ namespace TangibleAnchoring
                     MainCanvas.Children.Add(tagEllipse);
                     taggedEllipses.Add(tagEllipse.Uid, tagEllipse);
                     //This will produce details on demand
-                    
+
+                }
+                else //remove tagging
+                {
+                    MainCanvas.Children.Remove(taggedEllipses["tag_" + submissionIndex]);
+                    taggedEllipses.Remove("tag_" + submissionIndex); 
                 }
                 Submission submission = submissionData.Submissions[submissionIndex];
                 UpdateDescription(RootGrid, e.TouchDevice, submission, true);
@@ -1140,6 +1196,7 @@ namespace TangibleAnchoring
                         }
                     }
                 }
+                
             }
         }
 
@@ -1172,11 +1229,13 @@ namespace TangibleAnchoring
             double tOrientation = tangibleViz.Orientation, tX, tY;
             tX = tangibleViz.Center.X;
             tY = tangibleViz.Center.Y;
+            
             VizOperationReset();
             switch (tangibleViz.VisualizedTag.Value)
             {
                 case 222: //Viewpoint Republican
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("222").Name;
+                    tangiblesOnTable.Add(configData.FindTangibleFromId("222").Name);
                     tangibleViz.myArrow.Stroke = viewpointColors[6];
                     tangibleViz.myEllipse.Stroke = viewpointColors[6];
                     //TODO could replace "49" with the question corresponding to viewpoint tangible and the answer ids to the ids in facet[0]
@@ -1184,29 +1243,34 @@ namespace TangibleAnchoring
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
+                    tangiblesOnTable.Add(configData.FindTangibleFromId("210").Name);
                     tangibleViz.myArrow.Stroke = viewpointColors[3];
                     tangibleViz.myEllipse.Stroke = viewpointColors[3];
                     filterCriteria.AddIds("49", "3,4,5");
                     break;
                 case 212: //Viewpoint Democrat
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
+                    tangiblesOnTable.Add(configData.FindTangibleFromId("212").Name);
                     tangibleViz.myArrow.Stroke = viewpointColors[0];
                     tangibleViz.myEllipse.Stroke = viewpointColors[0];
                     filterCriteria.AddIds("49", "1,2");
                     break;
                 case 208: //Question Changer
-                    tangibleViz.TangibleInfo.Content = "Q?";
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("208").Name;
+                    tangiblesOnTable.Add(configData.FindTangibleFromId("208").Name);
                     tangibleViz.myArrow.Stroke = Brushes.Green;
                     tangibleViz.myEllipse.Stroke = Brushes.Green;
                     filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
                     break;
                 case 213: //Answer Changer
-                    tangibleViz.TangibleInfo.Content = "Ans?";
+                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("213").Name;
+                    tangiblesOnTable.Add(configData.FindTangibleFromId("213").Name);
                     tangibleViz.myArrow.Stroke = Brushes.MediumPurple;
                     tangibleViz.myEllipse.Stroke = Brushes.MediumPurple;
                     break;
                 case 214: //XAxisStarter
                     tangibleViz.TangibleInfo.Content = "Xmin";
+                    tangiblesOnTable.Add("Xmin");
                     tangibleViz.myArrow.Stroke = SurfaceColors.Accent3Brush;
                     tangibleViz.myEllipse.Stroke = SurfaceColors.Accent3Brush;
                     if (tX <= xRangeStart)
@@ -1221,11 +1285,13 @@ namespace TangibleAnchoring
                     break;
                 case 209: //XAxisEnd
                     tangibleViz.TangibleInfo.Content = "Xmax";
+                    tangiblesOnTable.Add("Xmax");
                     tangibleViz.myArrow.Stroke = SurfaceColors.Accent3Brush;
                     tangibleViz.myEllipse.Stroke = SurfaceColors.Accent3Brush;
                     break;
                 case 211: //YAxisStarter
                     tangibleViz.TangibleInfo.Content = "Ymin";
+                    tangiblesOnTable.Add("Ymin");
                     tangibleViz.myArrow.Stroke = SurfaceColors.ControlAccentBrush;
                     tangibleViz.myEllipse.Stroke = SurfaceColors.ControlAccentBrush;
                     if (tY >= xRangeStart)
@@ -1240,14 +1306,16 @@ namespace TangibleAnchoring
                     break;
                 case 215: //YAxisEnd
                     tangibleViz.TangibleInfo.Content = "Ymax";
+                    tangiblesOnTable.Add("Ymax");
                     tangibleViz.myArrow.Stroke = SurfaceColors.ControlForegroundBrush;
                     tangibleViz.myEllipse.Stroke = SurfaceColors.ControlForegroundBrush;
                     break;
                 case 223: //Tagger
                     tangibleViz.TangibleInfo.Content = "Tagger";
+                    tangiblesOnTable.Add("Tagger");
                     tangibleViz.myArrow.Stroke = Brushes.PeachPuff;
                     tangibleViz.myEllipse.Stroke = Brushes.PeachPuff;
-                    allowTagging = true;
+                    //allowTagging = true;
                     break;
             }
             LogMsg(filterCriteria.ToLogString());
@@ -1492,6 +1560,36 @@ namespace TangibleAnchoring
                     }
                     break;
                 case 223: //Tagger
+                    
+                    if (tOrientation >= 0 && tOrientation < 360) //these conditions required because sometimes the orientation value becomes negative or is more than 360
+                    {
+                        int numFacets = 2;
+                        int facetIndex = (int)Math.Floor(tOrientation / (360.00 / numFacets));
+
+                        switch (facetIndex)
+                        {
+                            case 0:
+                                //show only tagged ellipses
+                                showTaggedDataPointsOnly = true;
+                                allowTagging = false;
+                                TangibleSelectionMessage("Show Tagged Points");
+                                break;
+                            case 1:
+                                //allow tagging and untagging (by double tap)
+                                allowTagging = true;
+                                showTaggedDataPointsOnly = false;
+                                TangibleSelectionMessage("Allow Tagging");
+                                break;
+                        }
+                        //[FIX] for the case when tagger moves from showTaggedDataPoinst to allowTagging while X or Y axis 
+                        //tangible is on the table and the point beyond the axes become visible
+                        VizOperationReset();
+                        if (tangiblesOnTable.Contains("Xmin") || tangiblesOnTable.Contains("Xmax")) { redrawPointsOnXAxisZoom = true; }
+                        if (tangiblesOnTable.Contains("Ymin") || tangiblesOnTable.Contains("Ymax")) { redrawPointsOnYAxisZoom = true; }
+
+                        DrawPoints();
+                    }
+                    
                     break;
             }
 
@@ -1513,12 +1611,16 @@ namespace TangibleAnchoring
             switch (tangibleViz.VisualizedTag.Value)
             {
                 case 222: //Viewpoint Republican
+                    tangiblesOnTable.Remove(configData.FindTangibleFromId("222").Name);
+                    tangiblesOnTable.Add("Xmin");
                     filterCriteria.RemoveIds("49", "6,7");
                     break;
                 case 210: //Viewpoint Independent
+                    tangiblesOnTable.Remove(configData.FindTangibleFromId("210").Name);
                     filterCriteria.RemoveIds("49", "3,4,5");
                     break;
                 case 212: //Viewpoint Democrat
+                    tangiblesOnTable.Remove(configData.FindTangibleFromId("212").Name);
                     filterCriteria.RemoveIds("49", "1,2");
                     break;
                 case 208: //Question Changer
@@ -1526,10 +1628,12 @@ namespace TangibleAnchoring
                     break;
                 case 213: //Answer Changer
                     //Once the answer changer is taken off the table, filter should be removed
+                    tangiblesOnTable.Remove(configData.FindTangibleFromId("213").Name);
                     filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers"); //same as removing previously set ids
                     SetAnswer(CurrentQuestion.Uid, "");
                     break;
                 case 214: //XAxisStarter
+                    tangiblesOnTable.Remove("Xmin");
                     prevXDomainStart = xDomainStart;
                     xDomainStart = xRangeStart;
                     redrawPointsOnXAxisZoom = true;
@@ -1538,6 +1642,7 @@ namespace TangibleAnchoring
                     DrawXTicks();
                     break;
                 case 209: //XAxisEnd
+                    tangiblesOnTable.Remove("Xmax");
                     prevXDomainEnd = xDomainEnd;
                     xDomainEnd = xRangeEnd;
                     redrawPointsOnXAxisZoom = true;
@@ -1546,6 +1651,7 @@ namespace TangibleAnchoring
                     DrawXTicks();
                     break;
                 case 211: //YAxisStarter
+                    tangiblesOnTable.Remove("Ymin");
                     prevYDomainStart = yDomainStart;
                     yDomainStart = yRangeStart;
                     redrawPointsOnYAxisZoom = true;
@@ -1554,6 +1660,7 @@ namespace TangibleAnchoring
                     DrawYTicks();
                     break;
                 case 215: //YAxisEnd
+                    tangiblesOnTable.Remove("Ymax");
                     prevYDomainEnd = yDomainEnd;
                     yDomainEnd = yRangeEnd;
                     redrawPointsOnYAxisZoom = true;
@@ -1562,8 +1669,13 @@ namespace TangibleAnchoring
                     DrawYTicks();
                     break;
                 case 223: //Tagger
+                    tangiblesOnTable.Remove("Tagger");
                     allowTagging = false;
-
+                    showTaggedDataPointsOnly = false;
+                    
+                        if (tangiblesOnTable.Contains("Xmin") || tangiblesOnTable.Contains("Xmax")) { redrawPointsOnXAxisZoom = true; }
+                        if (tangiblesOnTable.Contains("Ymin") || tangiblesOnTable.Contains("Ymax")) { redrawPointsOnYAxisZoom = true; }
+                        DrawPoints();
                     //Remove the ellipses from MainCanvas and clear the taggedEllipses list
                     //foreach (string tagKey in taggedEllipses.Keys)
                     //{
