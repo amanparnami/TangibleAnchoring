@@ -146,6 +146,7 @@ namespace TangibleAnchoring
             }
 
             InitScatterplot("88", "All Answers", "46", "4");
+           
         }
 
         /// <summary>
@@ -158,6 +159,12 @@ namespace TangibleAnchoring
         private void InitScatterplot(string quesId, string ansId, string xAxisQuesId, string yAxisQuesId)
         {
             SetQuestion(quesId);
+
+            //This is because by default we don't want to show any question or answer
+            //unless question changer or answer changer tangible is put on the table once
+            CurrentQuestion.Visibility = System.Windows.Visibility.Hidden;
+            CurrentAnswer.Visibility = System.Windows.Visibility.Hidden;
+           
             // Initialize the XAxis
             SetXAxis(xAxisQuesId);
 
@@ -1293,6 +1300,10 @@ namespace TangibleAnchoring
                     tangiblesOnTable.Add(configData.FindTangibleFromId("208").Name);
                     tangibleViz.myArrow.Stroke = Brushes.Green;
                     tangibleViz.myEllipse.Stroke = Brushes.Green;
+
+                    CurrentQuestion.Visibility = System.Windows.Visibility.Visible;
+                    CurrentAnswer.Visibility = System.Windows.Visibility.Visible;
+
                     filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
                     break;
                 case 213: //Answer Changer
