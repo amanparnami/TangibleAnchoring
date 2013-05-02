@@ -1220,7 +1220,16 @@ namespace TangibleAnchoring
                         }
                     }
                 }
-                
+                //[Fix] Case when only tagger (show tagged points mode) and viewpoint tangibles are on the table, 
+                //all the points corresponding to the viewpoint appear 
+                if (showTaggedDataPointsOnly)
+                {
+                   
+                        if (!taggedEllipses.ContainsKey("tag_" + i)) //the data point at index is not tagged
+                        {
+                            dataPointEllipses[i].Visibility = System.Windows.Visibility.Hidden;
+                        }
+                } 
             }
         }
 
@@ -1341,6 +1350,19 @@ namespace TangibleAnchoring
                     tangibleViz.myEllipse.Stroke = Brushes.PeachPuff;
                     //allowTagging = true;
                     break;
+                case 221: //Tagger Deletion
+                    tangibleViz.TangibleInfo.Content = "Tagger Delete";
+                    //tangiblesOnTable.Add("Tagger");
+                    tangibleViz.myArrow.Stroke = Brushes.PeachPuff;
+                    tangibleViz.myEllipse.Stroke = Brushes.PeachPuff;
+                    //allowTagging = true;
+                    //Remove the ellipses from MainCanvas and clear the taggedEllipses list
+                    foreach (string tagKey in taggedEllipses.Keys)
+                    {
+                        MainCanvas.Children.Remove(taggedEllipses[tagKey]);
+                    }
+                    taggedEllipses.Clear();
+                    break;
             }
             LogMsg(filterCriteria.ToLogString());
             VizOperationFilter(filterCriteria);
@@ -1459,6 +1481,11 @@ namespace TangibleAnchoring
                             {
                                 string ansId = configData.FindQuestionFromId(CurrentQuestion.Uid).Answers[facetIndex - 1].AnswerId;
                                 //Since we know that at a time only one answer can appear for answer changer tangible we will manually replace the value of first element in criteria
+                                //[Fix]  Case when answer tangible is put on table before question tangible is put on it.
+                                if (!filterCriteria.QuesIdAnsIdsMap.ContainsKey(CurrentQuestion.Uid))
+                                {
+                                    filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
+                                }
                                 filterCriteria.QuesIdAnsIdsMap[CurrentQuestion.Uid][0] = ansId;
                                 SetAnswer(CurrentQuestion.Uid, ansId);
                             }
@@ -1699,13 +1726,10 @@ namespace TangibleAnchoring
                     
                         if (tangiblesOnTable.Contains("Xmin") || tangiblesOnTable.Contains("Xmax")) { redrawPointsOnXAxisZoom = true; }
                         if (tangiblesOnTable.Contains("Ymin") || tangiblesOnTable.Contains("Ymax")) { redrawPointsOnYAxisZoom = true; }
-                        DrawPoints();
-                    //Remove the ellipses from MainCanvas and clear the taggedEllipses list
-                    //foreach (string tagKey in taggedEllipses.Keys)
-                    //{
-                    //    MainCanvas.Children.Remove(taggedEllipses[tagKey]);
-                    //}
-                    //taggedEllipses.Clear();
+                        if (redrawPointsOnXAxisZoom || redrawPointsOnYAxisZoom)
+                        {
+                            DrawPoints();
+                        }
                     break;
             }
             LogMsg(filterCriteria.ToLogString());
