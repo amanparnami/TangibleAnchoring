@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <SubmissionData>
   <Submissions>
     <Submission>
@@ -36,12 +36,12 @@
         <Response>
           <QuestionId>88</QuestionId>
           <AnswerId>3</AnswerId>
-          <MediaName>1</MediaName>
+          <MediaName>0</MediaName>
         </Response>
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>07_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -80,7 +80,7 @@
         <Response>
           <QuestionId>88</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>1</MediaName>
+          <MediaName>0</MediaName>
         </Response>
         <Response>
           <QuestionId>48</QuestionId>
@@ -129,7 +129,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>1</MediaName>
+          <MediaName>0</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -173,7 +173,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>1</MediaName>
+          <MediaName>0</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -217,7 +217,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>1</MediaName>
+          <MediaName>0</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -1141,7 +1141,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>15_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -12405,7 +12405,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>13_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -12493,7 +12493,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>05_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -17333,7 +17333,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>11_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -20149,7 +20149,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>09_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -21733,7 +21733,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>10_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -30664,8 +30664,8 @@
         </Response>
         <Response>
           <QuestionId>48</QuestionId>
-          <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <AnswerId>2</AnswerId>
+          <MediaName>16_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31193,7 +31193,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>02_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31369,7 +31369,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>04_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31457,7 +31457,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>01_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31501,7 +31501,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>1</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>03_L.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31589,7 +31589,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>12_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31677,7 +31677,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>06_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31809,7 +31809,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>08_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>
@@ -31897,7 +31897,7 @@
         <Response>
           <QuestionId>48</QuestionId>
           <AnswerId>2</AnswerId>
-          <MediaName>0</MediaName>
+          <MediaName>14_R.mpg</MediaName>
         </Response>
       </Responses>
     </Submission>

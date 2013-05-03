@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Config>
-  <SubmissionsFileUri>SubmissionData.xml</SubmissionsFileUri>
+  <SubmissionsFileUri>SubmissionData_v2.xml</SubmissionsFileUri>
   <VideoMarker>videoMarker.svg</VideoMarker>
   <PollMarker>pollMarker.svg</PollMarker>
   <Tangibles>
