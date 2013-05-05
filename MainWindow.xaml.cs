@@ -30,13 +30,15 @@ namespace TangibleAnchoring
                             xTickLabelLeftNoZoom = new List<double>(), 
                             yTickYNoZoom = new List<double>(), 
                             yTickLabelTopNoZoom = new List<double>();
-        private Criteria filterCriteria = new Criteria("49", "All Answers");
+       
         Ellipse haloEllipse = new Ellipse();
         bool allowTagging = false;
         bool showTaggedDataPointsOnly = false;
         bool redrawPointsOnAxisChange = false;
         bool redrawPointsOnXAxisZoom = false, redrawTicksOnXAxisZoom = false;
         bool redrawPointsOnYAxisZoom = false,  redrawTicksOnYAxisZoom = false;
+
+        //True: Show log messages on the left top, False: show facet labels
         bool showLogMsg = false;
 
         //Following variables are declared to avoid continuous calls to setAxis and DrawPoints
@@ -60,9 +62,18 @@ namespace TangibleAnchoring
         Dictionary<string, Line> yTickLines = new Dictionary<string, Line>();
         Dictionary<string, TextBlock> yTickLabels = new Dictionary<string, TextBlock>();
         List<string> tangiblesOnTable = new List<string>();
+       
+        // TODO Pull this out into the config.xml file
+        double DataPointWidth = 40.0;
+        double DataPointHeight = 40.0;
 
-        double DataPointWidth = 20.0;
-        double DataPointHeight = 20.0;
+        double VideoPointOpacity = 1.0;
+        double RegularPointOpacity = 0.6;
+
+       const string ViewpointQuestionId = "49"; //  49 is political affiliation in dummy data set
+        const string AttributeRangeQuestionId = "4"; // 4 is for age in dummy data set
+
+        private Criteria filterCriteria = new Criteria(ViewpointQuestionId, "All Answers");
 
         SolidColorBrush[] viewpointColors = {
                                                 (SolidColorBrush)(new BrushConverter().ConvertFrom("#0171d0")),
@@ -131,8 +142,8 @@ namespace TangibleAnchoring
             YDomainLength = YAxisLength;
             XAxisLength = xRangeEnd - xRangeStart;
             XDomainLength = XAxisLength;
-            proposedXAxisLength = XAxisLength;
-            proposedYAxisLength = YAxisLength;
+            //proposedXAxisLength = XAxisLength;
+            //proposedYAxisLength = YAxisLength;
 
             if (showLogMsg)
             {
@@ -145,7 +156,7 @@ namespace TangibleAnchoring
                 TangibleSelection.Visibility = System.Windows.Visibility.Visible;
             }
 
-            InitScatterplot("88", "All Answers", "46", "4");
+            InitScatterplot("88", "All Answers", "46", AttributeRangeQuestionId);
            
         }
 
@@ -301,7 +312,7 @@ namespace TangibleAnchoring
 
                     // AnswerId - 1 because viewpoints are numbered from 1..7 
                     temp.Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
-                    temp.Opacity = 0.6;
+                    temp.Opacity = VideoPointOpacity;
                     MainCanvas.Children.Remove(dataPointShapes[index]);
                     dataPointShapes[index] = temp;
                     MainCanvas.Children.Add(dataPointShapes[index]);
@@ -322,7 +333,7 @@ namespace TangibleAnchoring
 
                     // AnswerId - 1 because viewpoints are numbered from 1..7 
                     temp.Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
-                    temp.Opacity = 0.6;
+                    temp.Opacity = RegularPointOpacity;
 
                     MainCanvas.Children.Remove(dataPointShapes[index]);
                     dataPointShapes[index] = temp;
@@ -463,6 +474,7 @@ namespace TangibleAnchoring
                             yTickLabels.Add(tLabel.Name, tLabel);
                         }
                     }
+                        //TODO This is for range. We may want to divide a range in no more than 5-6.
                     else if (range > 10)
                     {
                         double step = YAxisLength / 10;
@@ -730,11 +742,13 @@ namespace TangibleAnchoring
                         if (sData.FindResponseFromQuestionId(CurrentQuestion.Uid).MediaName != "0")
                         {
                             dataPointShapes[index] = new Rectangle();
+                            dataPointShapes[index].Opacity = VideoPointOpacity;
        
                         }
                         else
                         {
                             dataPointShapes[index] = new Ellipse();
+                            dataPointShapes[index].Opacity = RegularPointOpacity;
                         }
                         
                         string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
@@ -752,7 +766,7 @@ namespace TangibleAnchoring
                         double topPosition = 0.0, rangeYAxis = 0.0;
                         switch (quesIdForYAxis)
                         {
-                            case "4": //Age
+                            case AttributeRangeQuestionId: //Age - range
                                 string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
                                 rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
                                 //For general case use the answerId found in next statement to find the x,y position
@@ -784,7 +798,7 @@ namespace TangibleAnchoring
 
                         // AnswerId - 1 because viewpoints are numbered from 1..7 
                         dataPointShapes[index].Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
-                        dataPointShapes[index].Opacity = 0.6;
+                        
                         MainCanvas.Children.Add(dataPointShapes[index]);
                         
                     }
@@ -814,7 +828,7 @@ namespace TangibleAnchoring
                             double topPosition = 0.0, rangeYAxis = 0.0;
                             switch (quesIdForYAxis)
                             {
-                                case "4": //Age
+                                case AttributeRangeQuestionId: //Age
                                     string[] answerRangeArr = configData.FindQuestionFromId(quesIdForYAxis).AnswerRange.Split(',');
                                     rangeYAxis = double.Parse(answerRangeArr[1]) - double.Parse(answerRangeArr[0]);
                                     //For general case use the answerId found in next statement to find the x,y position
@@ -931,7 +945,7 @@ namespace TangibleAnchoring
                             double newTopPosition = 0.0;
                             switch (quesIdForYAxis)
                             {
-                                case "4": //Age
+                                case AttributeRangeQuestionId: //Age
                                     newTopPosition = (currentTopPosition - yRangeEnd) * zoomFactor - yEndShift * zoomFactor + yRangeEnd;
                                     //topPosition = YAxis.Y2 - (double)answerValue * (YAxisLength / rangeYAxis) - 10;
                                     break;
@@ -1016,8 +1030,8 @@ namespace TangibleAnchoring
                     Ellipse tagEllipse = new Ellipse();
                     tagEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width / 4);
                     tagEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height / 4);
-                    tagEllipse.Height = 30;
-                    tagEllipse.Width = 30;
+                    tagEllipse.Height = DataPointWidth + 10;
+                    tagEllipse.Width = DataPointHeight + 10;
                     tagEllipse.Stroke = Brushes.Aqua;
                     tagEllipse.Uid = "tag_" + submissionIndex;
                     tagEllipse.StrokeThickness = 2;
@@ -1036,10 +1050,10 @@ namespace TangibleAnchoring
             }
             else
             {
-                haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width / 4);
-                haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height / 4);
-                haloEllipse.Height = 30;
-                haloEllipse.Width = 30;
+                haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - 10);
+                haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - 10);
+                haloEllipse.Height = DataPointWidth + 10;
+                haloEllipse.Width = DataPointHeight + 10;
                 haloEllipse.Stroke = Brushes.AntiqueWhite;
                 haloEllipse.StrokeThickness = 2;
                 MainCanvas.Children.Remove(haloEllipse); //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
@@ -1177,8 +1191,8 @@ namespace TangibleAnchoring
             //TODO Make the text dynamic as per axis or static based on what susan needs
 
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, XAxisLabel.Content + ": {0}", configData.FindQuestionFromId(XAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(XAxis.Uid).AnswerId) - 1].AnswerText));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, YAxisLabel.Content + ": {0}", (YAxis.Uid == "4") ? submission.Age.ToString() : configData.FindQuestionFromId(YAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(YAxis.Uid).AnswerId) - 1].AnswerText));
-            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Affiliation: {0}", configData.FindAnswerFromQuesIdAnsId("49", submission.FindResponseFromQuestionId("49").AnswerId).AnswerText));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, YAxisLabel.Content + ": {0}", (YAxis.Uid == AttributeRangeQuestionId) ? submission.Age.ToString() : configData.FindQuestionFromId(YAxis.Uid).Answers[int.Parse(submission.FindResponseFromQuestionId(YAxis.Uid).AnswerId) - 1].AnswerText));
+            descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Affiliation: {0}", configData.FindAnswerFromQuesIdAnsId(ViewpointQuestionId, submission.FindResponseFromQuestionId(ViewpointQuestionId).AnswerId).AnswerText));
             descriptionText.AppendLine(String.Format(CultureInfo.InvariantCulture, "Response: {0}", configData.FindAnswerFromQuesIdAnsId(CurrentQuestion.Uid, submission.FindResponseFromQuestionId(CurrentQuestion.Uid).AnswerId).AnswerText));
 
             // Update the description textbox.
@@ -1316,22 +1330,22 @@ namespace TangibleAnchoring
                     tangiblesOnTable.Add(configData.FindTangibleFromId("222").Name);
                     tangibleViz.myArrow.Stroke = viewpointColors[6];
                     tangibleViz.myEllipse.Stroke = viewpointColors[6];
-                    //TODO could replace "49" with the question corresponding to viewpoint tangible and the answer ids to the ids in facet[0]
-                    filterCriteria.AddIds("49", "6,7");
+                    //TODO could replace ViewpointQuestionId with the question corresponding to viewpoint tangible and the answer ids to the ids in facet[0]
+                    filterCriteria.AddIds(ViewpointQuestionId, "6,7");
                     break;
                 case 210: //Viewpoint Independent
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("210").Name;
                     tangiblesOnTable.Add(configData.FindTangibleFromId("210").Name);
                     tangibleViz.myArrow.Stroke = viewpointColors[3];
                     tangibleViz.myEllipse.Stroke = viewpointColors[3];
-                    filterCriteria.AddIds("49", "3,4,5");
+                    filterCriteria.AddIds(ViewpointQuestionId, "3,4,5");
                     break;
                 case 212: //Viewpoint Democrat
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("212").Name;
                     tangiblesOnTable.Add(configData.FindTangibleFromId("212").Name);
                     tangibleViz.myArrow.Stroke = viewpointColors[0];
                     tangibleViz.myEllipse.Stroke = viewpointColors[0];
-                    filterCriteria.AddIds("49", "1,2");
+                    filterCriteria.AddIds(ViewpointQuestionId, "1,2");
                     break;
                 case 208: //Question Changer
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("208").Name;
@@ -1344,8 +1358,8 @@ namespace TangibleAnchoring
 
                     filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
                     break;
-                case 213: //Answer Changer
                     tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("213").Name;
+                case 213: //Answer Changer
                     tangiblesOnTable.Add(configData.FindTangibleFromId("213").Name);
                     tangibleViz.myArrow.Stroke = Brushes.MediumPurple;
                     tangibleViz.myEllipse.Stroke = Brushes.MediumPurple;
@@ -1447,8 +1461,8 @@ namespace TangibleAnchoring
                         TangibleSelectionMessage(facetLabel);
                         if (prevRepViewPtFacetIndex != facetIndex)
                         {
-                            filterCriteria.RemoveIds("49", "6,7");
-                            filterCriteria.AddIds("49", facetAnswerIds);
+                            filterCriteria.RemoveIds(ViewpointQuestionId, "6,7");
+                            filterCriteria.AddIds(ViewpointQuestionId, facetAnswerIds);
                             
                             prevRepViewPtFacetIndex = facetIndex;
                         }
@@ -1467,8 +1481,8 @@ namespace TangibleAnchoring
                         TangibleSelectionMessage(facetLabel);
                         if (prevIndViewPtFacetIndex != facetIndex)
                         {
-                            filterCriteria.RemoveIds("49", "3,4,5");
-                            filterCriteria.AddIds("49", facetAnswerIds);
+                            filterCriteria.RemoveIds(ViewpointQuestionId, "3,4,5");
+                            filterCriteria.AddIds(ViewpointQuestionId, facetAnswerIds);
                             
                             prevIndViewPtFacetIndex = facetIndex;
                         }
@@ -1486,8 +1500,8 @@ namespace TangibleAnchoring
                         TangibleSelectionMessage(facetLabel);
                         if (prevDemViewPtFacetIndex != facetIndex)
                         {
-                            filterCriteria.RemoveIds("49", "1,2");
-                            filterCriteria.AddIds("49", facetAnswerIds);
+                            filterCriteria.RemoveIds(ViewpointQuestionId, "1,2");
+                            filterCriteria.AddIds(ViewpointQuestionId, facetAnswerIds);
                             
                             prevDemViewPtFacetIndex = facetIndex;
                         }
@@ -1715,15 +1729,15 @@ namespace TangibleAnchoring
                 case 222: //Viewpoint Republican
                     tangiblesOnTable.Remove(configData.FindTangibleFromId("222").Name);
                     tangiblesOnTable.Add("Xmin");
-                    filterCriteria.RemoveIds("49", "6,7");
+                    filterCriteria.RemoveIds(ViewpointQuestionId, "6,7");
                     break;
                 case 210: //Viewpoint Independent
                     tangiblesOnTable.Remove(configData.FindTangibleFromId("210").Name);
-                    filterCriteria.RemoveIds("49", "3,4,5");
+                    filterCriteria.RemoveIds(ViewpointQuestionId, "3,4,5");
                     break;
                 case 212: //Viewpoint Democrat
                     tangiblesOnTable.Remove(configData.FindTangibleFromId("212").Name);
-                    filterCriteria.RemoveIds("49", "1,2");
+                    filterCriteria.RemoveIds(ViewpointQuestionId, "1,2");
                     break;
                 case 208: //Question Changer
                     //Do nothing as the question that was set has to persist
