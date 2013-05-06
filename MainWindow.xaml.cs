@@ -25,13 +25,16 @@ namespace TangibleAnchoring
         private readonly Config.Config configData;
         private readonly Submissions.SubmissionData submissionData;
         private Shape[] dataPointShapes;
+
         private double[] dataPointLeftPosNoZoom, dataPointTopPosNoZoom;
+        Dictionary<string, Shape> taggedEllipses = new Dictionary<string, Shape>();
+
         private List<double> xTickXNoZoom = new List<double>(), 
                             xTickLabelLeftNoZoom = new List<double>(), 
                             yTickYNoZoom = new List<double>(), 
                             yTickLabelTopNoZoom = new List<double>();
        
-        Ellipse haloEllipse = new Ellipse();
+        Shape haloEllipse;
         bool allowTagging = false;
         bool showTaggedDataPointsOnly = false;
         bool redrawPointsOnAxisChange = false;
@@ -39,7 +42,7 @@ namespace TangibleAnchoring
         bool redrawPointsOnYAxisZoom = false,  redrawTicksOnYAxisZoom = false;
 
         //True: Show log messages on the left top, False: show facet labels
-        bool showLogMsg = false;
+        bool showLogMsg = true;
 
         //Following variables are declared to avoid continuous calls to setAxis and DrawPoints
         int prevXMinFacetIndex = 0,
@@ -53,10 +56,9 @@ namespace TangibleAnchoring
         double prevXDomainStart, prevXDomainEnd, prevYDomainStart, prevYDomainEnd;
         double xDomainStart, xDomainEnd, yDomainStart, yDomainEnd;
         double xRangeStart, xRangeEnd, yRangeStart, yRangeEnd;
-        double proposedXAxisLength, proposedYAxisLength;
         double axisChangeTolerance = 1.0;
 
-        Dictionary<string, Ellipse> taggedEllipses = new Dictionary<string, Ellipse>();
+        
         Dictionary<string, Line> xTickLines = new Dictionary<string, Line>();
         Dictionary<string, TextBlock> xTickLabels = new Dictionary<string, TextBlock>();
         Dictionary<string, Line> yTickLines = new Dictionary<string, Line>();
@@ -66,6 +68,8 @@ namespace TangibleAnchoring
         // TODO Pull this out into the config.xml file
         double DataPointWidth = 40.0;
         double DataPointHeight = 40.0;
+
+        double TaggedEllipseSizeOffset = 15;
 
         double VideoPointOpacity = 1.0;
         double RegularPointOpacity = 0.6;
@@ -84,16 +88,7 @@ namespace TangibleAnchoring
                                                 (SolidColorBrush)(new BrushConverter().ConvertFrom("#f12727")),
                                                 (SolidColorBrush)(new BrushConverter().ConvertFrom("#b30000"))
                                             };
-        //WA = Work Area
 
-        //private double WAWidth = System.Windows.SystemParameters.WorkArea.Width;
-        //private double WAHeight = System.Windows.SystemParameters.WorkArea.Height;
-        //double screenWidth = System.Windows.SystemParameters.PrimaryScreenWidth;
-        //double screenHeight = System.Windows.SystemParameters.PrimaryScreenHeight;
-        //private double leftMargin = 100;
-        //private double bottomMargin = 50;
-        //private double rightMargin = 50;
-        //private double topMargin = 50;
         private double YAxisLength, YDomainLength;
         private double XAxisLength, XDomainLength;
 
@@ -316,6 +311,24 @@ namespace TangibleAnchoring
                     MainCanvas.Children.Remove(dataPointShapes[index]);
                     dataPointShapes[index] = temp;
                     MainCanvas.Children.Add(dataPointShapes[index]);
+                    if (taggedEllipses.ContainsKey("tag_" + index))
+                    {
+                        if (!(taggedEllipses["tag_" + index].GetType().ToString() == "System.Windows.Shapes.Rectangle"))
+                        {
+                            MainCanvas.Children.Remove(taggedEllipses["tag_" + index]);
+                            taggedEllipses.Remove("tag_" + index);
+                            Rectangle tagEllipse = new Rectangle();
+                            tagEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(temp) - TaggedEllipseSizeOffset / 2);
+                            tagEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(temp) - TaggedEllipseSizeOffset / 2);
+                            tagEllipse.Height = DataPointWidth + TaggedEllipseSizeOffset;
+                            tagEllipse.Width = DataPointHeight + TaggedEllipseSizeOffset;
+                            tagEllipse.Stroke = Brushes.Aqua;
+                            tagEllipse.Uid = "tag_" + index;
+                            tagEllipse.StrokeThickness = 2;
+                            MainCanvas.Children.Add(tagEllipse);
+                            taggedEllipses.Add(tagEllipse.Uid, tagEllipse);
+                        }
+                    }
                 }
                 else
                 {
@@ -338,35 +351,32 @@ namespace TangibleAnchoring
                     MainCanvas.Children.Remove(dataPointShapes[index]);
                     dataPointShapes[index] = temp;
                     MainCanvas.Children.Add(dataPointShapes[index]);
+                    if (taggedEllipses.ContainsKey("tag_" + index))
+                    {
+                        if (!(taggedEllipses["tag_" + index].GetType().ToString() == "System.Windows.Shapes.Ellipse"))
+                        {
+                            MainCanvas.Children.Remove(taggedEllipses["tag_" + index]);
+                            taggedEllipses.Remove("tag_" + index);
+                            Ellipse tagEllipse = new Ellipse();
+                            tagEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(temp) - TaggedEllipseSizeOffset / 2);
+                            tagEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(temp) - TaggedEllipseSizeOffset / 2);
+                            tagEllipse.Height = DataPointWidth + TaggedEllipseSizeOffset;
+                            tagEllipse.Width = DataPointHeight + TaggedEllipseSizeOffset;
+                            tagEllipse.Stroke = Brushes.Aqua;
+                            tagEllipse.Uid = "tag_" + index;
+                            tagEllipse.StrokeThickness = 2;
+                            MainCanvas.Children.Add(tagEllipse);
+                            taggedEllipses.Add(tagEllipse.Uid, tagEllipse);
+                        }
+                    }
+
                 }
 
             }
 
         }
 
-        //private Line getTickFromId(string axis, string answerId)
-        //{
-        //    Line newTick = new Line();
-        //    switch (axis)
-        //    {
-        //        case "xaxis":
-        //            LogMsg("Answerid: "+answerId);
-        //            if (MainCanvas.FindName("XTick_2") != null)
-        //            {
-        //                newTick = (Line) MainCanvas.FindName("XTick_" + answerId);
-        //            }
-        //            break;
-        //        case "yaxis":
-        //            //This is needed only if the variable is not a range otherwise a direct calculation of x, y is required
-        //            //newTick = (Line)MainCanvas.FindName("YTick_" + answerId);
-        //            break;
-        //        default:
-        //            break;
-        //    }
 
-
-        //    return newTick;
-        //}
         #endregion Helper_Functions
 
         #region Drawing_Functions
@@ -779,7 +789,6 @@ namespace TangibleAnchoring
                             case "5": //Obama or Romney
                                 string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
                                 rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
-                                //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
                                 int yTickInterval = (int)(YAxisLength / rangeYAxis);
                                 topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10;
                                 break;
@@ -843,7 +852,7 @@ namespace TangibleAnchoring
 
                                     string answerIdForYAxis = sData.FindResponseFromQuestionId(YAxis.Uid).AnswerId;
                                     rangeYAxis = configData.FindQuestionFromId(YAxis.Uid).Answers.Length;
-                                    //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
+                                    
                                     int yTickInterval = (int)(YAxisLength / rangeYAxis);
                                     topPosition = YAxis.Y2 - yTickInterval * (int.Parse(answerIdForYAxis) - 1) - 10 - r.Next(yTickInterval);
                                     break;
@@ -852,30 +861,30 @@ namespace TangibleAnchoring
                             topPosition = (topPosition - yRangeEnd) * yZoomFactor - yEndShift * yZoomFactor + yRangeEnd;
                             if (taggedEllipses.ContainsKey("tag_" + index))
                             {
-                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, leftPosition - DataPointWidth/4);
-                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, topPosition - DataPointHeight/4);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, leftPosition - TaggedEllipseSizeOffset/2);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, topPosition - TaggedEllipseSizeOffset/2);
                             }
 
                             dataPointShapes[index].SetValue(Canvas.LeftProperty, leftPosition);
                             dataPointShapes[index].SetValue(Canvas.TopProperty, topPosition);
 
-                            if (leftPosition < xRangeStart || leftPosition >= xRangeEnd)
-                            {
-                                dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                                if (taggedEllipses.ContainsKey("tag_" + index))
-                                {
-                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
+                            //if (leftPosition < xRangeStart || leftPosition >= xRangeEnd)
+                            //{
+                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
+                            //    if (taggedEllipses.ContainsKey("tag_" + index))
+                            //    {
+                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                            //    }
+                            //}
 
-                            if (topPosition < yRangeEnd || topPosition >= yRangeStart)
-                            {
-                                dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                                if (taggedEllipses.ContainsKey("tag_" + index))
-                                {
-                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
+                            //if (topPosition < yRangeEnd || topPosition >= yRangeStart)
+                            //{
+                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
+                            //    if (taggedEllipses.ContainsKey("tag_" + index))
+                            //    {
+                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                            //    }
+                            //}
                         }
                         BackupDataPointPositions();
                         redrawPointsOnAxisChange = false;
@@ -906,26 +915,26 @@ namespace TangibleAnchoring
 
                             if (taggedEllipses.ContainsKey("tag_" + index))
                             {
-                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, newLeftPosition - DataPointWidth / 4);
-                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, currentTopPosition - DataPointHeight / 4);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, newLeftPosition - TaggedEllipseSizeOffset / 2);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, currentTopPosition - TaggedEllipseSizeOffset / 2);
                             }
 
-                            if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
-                            {
-                                dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                                if (taggedEllipses.ContainsKey("tag_" + index))
-                                {
-                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
-                            if (currentTopPosition < yRangeEnd || currentTopPosition >= yRangeStart)
-                            {
-                                dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                                if (taggedEllipses.ContainsKey("tag_" + index))
-                                {
-                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
+                            //if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
+                            //{
+                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
+                            //    if (taggedEllipses.ContainsKey("tag_" + index))
+                            //    {
+                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                            //    }
+                            //}
+                            //if (currentTopPosition < yRangeEnd || currentTopPosition >= yRangeStart)
+                            //{
+                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
+                            //    if (taggedEllipses.ContainsKey("tag_" + index))
+                            //    {
+                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                            //    }
+                            //}
                         }
                         redrawPointsOnXAxisZoom = false;
                     }
@@ -959,27 +968,27 @@ namespace TangibleAnchoring
 
                             if (taggedEllipses.ContainsKey("tag_" + index))
                             {
-                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, currentLeftPosition - DataPointWidth / 4);
-                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, newTopPosition - DataPointHeight / 4);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, currentLeftPosition - TaggedEllipseSizeOffset/2);
+                                taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, newTopPosition - TaggedEllipseSizeOffset/2);
                             }
 
-                            if (currentLeftPosition < xRangeStart || currentLeftPosition >= xRangeEnd)
-                            {
-                                dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                                if (taggedEllipses.ContainsKey("tag_" + index))
-                                {
-                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
+                            //if (currentLeftPosition < xRangeStart || currentLeftPosition >= xRangeEnd)
+                            //{
+                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
+                            //    if (taggedEllipses.ContainsKey("tag_" + index))
+                            //    {
+                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                            //    }
+                            //}
 
-                            if (newTopPosition < yRangeEnd || newTopPosition >= yRangeStart)
-                            {
-                                dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                                if (taggedEllipses.ContainsKey("tag_" + index))
-                                {
-                                    taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                                }
-                            }
+                            //if (newTopPosition < yRangeEnd || newTopPosition >= yRangeStart)
+                            //{
+                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
+                            //    if (taggedEllipses.ContainsKey("tag_" + index))
+                            //    {
+                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
+                            //    }
+                            //}
                         }
                         redrawPointsOnYAxisZoom = false;
                     }
@@ -1022,71 +1031,69 @@ namespace TangibleAnchoring
         private void DataPointTouchEnter(object sender, TouchEventArgs e)
         {
             Shape senderEllipse = sender as Shape;
+            string senderEllipseType = (senderEllipse.GetType().ToString() == "System.Windows.Shapes.Rectangle") ? "Rectangle" : "Ellipse";
             int submissionIndex = int.Parse(senderEllipse.Name.Split('_')[1]);
+            Shape tagEllipse;
             if (allowTagging)
             {
                 if (!taggedEllipses.ContainsKey("tag_" + submissionIndex)) //if the ellipse has not been tagged already
                 {
-                    Ellipse tagEllipse = new Ellipse();
-                    tagEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - senderEllipse.Width / 4);
-                    tagEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - senderEllipse.Height / 4);
-                    tagEllipse.Height = DataPointWidth + 10;
-                    tagEllipse.Width = DataPointHeight + 10;
+                    if(senderEllipseType == "Rectangle") 
+                    {
+                        tagEllipse = new Rectangle();
+                    } else 
+                    {
+                        tagEllipse = new Ellipse();
+                    }
+                    
+                    tagEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - TaggedEllipseSizeOffset/2);
+                    tagEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - TaggedEllipseSizeOffset/2);
+                    tagEllipse.Height = DataPointWidth + TaggedEllipseSizeOffset;
+                    tagEllipse.Width = DataPointHeight + TaggedEllipseSizeOffset;
                     tagEllipse.Stroke = Brushes.Aqua;
                     tagEllipse.Uid = "tag_" + submissionIndex;
                     tagEllipse.StrokeThickness = 2;
                     MainCanvas.Children.Add(tagEllipse);
                     taggedEllipses.Add(tagEllipse.Uid, tagEllipse);
-                    //This will produce details on demand
-
                 }
                 else //remove tagging
                 {
                     MainCanvas.Children.Remove(taggedEllipses["tag_" + submissionIndex]);
                     taggedEllipses.Remove("tag_" + submissionIndex); 
                 }
-                Submission submission = submissionData.Submissions[submissionIndex];
-                UpdateDescription(RootGrid, e.TouchDevice, submission, true);
+
             }
             else
             {
-                haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - 10);
-                haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - 10);
-                haloEllipse.Height = DataPointWidth + 10;
-                haloEllipse.Width = DataPointHeight + 10;
+                if (senderEllipseType == "Rectangle")
+                {
+                    haloEllipse = new Rectangle();
+                }
+                else
+                {
+                    haloEllipse = new Ellipse();
+                }
+                
+                haloEllipse.SetValue(Canvas.LeftProperty, Canvas.GetLeft(senderEllipse) - TaggedEllipseSizeOffset / 2);
+                haloEllipse.SetValue(Canvas.TopProperty, Canvas.GetTop(senderEllipse) - TaggedEllipseSizeOffset / 2);
+                haloEllipse.Height = DataPointWidth + TaggedEllipseSizeOffset;
+                haloEllipse.Width = DataPointHeight + TaggedEllipseSizeOffset;
                 haloEllipse.Stroke = Brushes.AntiqueWhite;
                 haloEllipse.StrokeThickness = 2;
                 MainCanvas.Children.Remove(haloEllipse); //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
                 MainCanvas.Children.Add(haloEllipse);
-
-
-                Submission submission = submissionData.Submissions[submissionIndex];
-                if (senderEllipse != null)
-                {
-                    //LogMsg(submission.UserId);
-                    LogMsg("UID:" + submission.UserId + " Left:" + dataPointLeftPosNoZoom[submissionIndex] + " Top:" + dataPointTopPosNoZoom[submissionIndex]);
-
-                    //Interactively remove elements that have been touched (could make for a game)
-                    //MainCanvas.Children.Remove(senderEllipse);
-                }
-
-                //This will produce details on demand
-                UpdateDescription(RootGrid, e.TouchDevice, submission, true);
             }
 
+            Submission submission = submissionData.Submissions[submissionIndex];
+            if (senderEllipse != null)
+            {
+                //LogMsg(submission.UserId);
+                //LogMsg("UID:" + submission.UserId + " Left:" + dataPointLeftPosNoZoom[submissionIndex] + " Top:" + dataPointTopPosNoZoom[submissionIndex]);
+                LogMsg((senderEllipse.GetType().ToString() == "System.Windows.Shapes.Rectangle")? "Rectangle" : "Ellipse");
+            }
 
-            // Capture to the ellipse.  
-            //e.TouchDevice.Capture(senderEllipse);
-
-            SolidColorBrush mySolidColorBrush = new SolidColorBrush();
-
-            // Describes the brush's color using RGB values.  
-            // Each value has a facetRange of 0-255.
-            mySolidColorBrush.Color = SurfaceColors.Accent2Color;
-
-            //Used to change color of touched elements.
-            //senderEllipse.Fill = mySolidColorBrush;
-
+            //This will produce details on demand
+            UpdateDescription(RootGrid, e.TouchDevice, submission, true);
 
             // Mark this event as handled.  
             e.Handled = true;
@@ -1288,7 +1295,28 @@ namespace TangibleAnchoring
                         {
                             dataPointShapes[i].Visibility = System.Windows.Visibility.Hidden;
                         }
-                } 
+                }
+
+                double leftPosition = (double) dataPointShapes[i].GetValue(Canvas.LeftProperty);
+                double topPosition = (double)dataPointShapes[i].GetValue(Canvas.TopProperty);
+
+                if (leftPosition < xRangeStart || leftPosition >= xRangeEnd)
+                {
+                    dataPointShapes[i].Visibility = System.Windows.Visibility.Hidden;
+                    if (taggedEllipses.ContainsKey("tag_" + i))
+                    {
+                        taggedEllipses["tag_" + i].Visibility = System.Windows.Visibility.Hidden;
+                    }
+                }
+
+                if (topPosition < yRangeEnd || topPosition >= yRangeStart)
+                {
+                    dataPointShapes[i].Visibility = System.Windows.Visibility.Hidden;
+                    if (taggedEllipses.ContainsKey("tag_" + i))
+                    {
+                        taggedEllipses["tag_" + i].Visibility = System.Windows.Visibility.Hidden;
+                    }
+                }
             }
         }
 
@@ -1358,7 +1386,7 @@ namespace TangibleAnchoring
 
                     filterCriteria.AddIds(CurrentQuestion.Uid, "All Answers");
                     break;
-                    tangibleViz.TangibleInfo.Content = configData.FindTangibleFromId("213").Name;
+                    
                 case 213: //Answer Changer
                     tangiblesOnTable.Add(configData.FindTangibleFromId("213").Name);
                     tangibleViz.myArrow.Stroke = Brushes.MediumPurple;
