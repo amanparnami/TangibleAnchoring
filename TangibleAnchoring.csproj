@@ -53,7 +53,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Config\Answer.cs" />
+    <Compile Include="Config\MediaDisplay.cs" />
     <Compile Include="Config\Facet.cs" />
+    <Compile Include="Config\PriorityQuestion.cs" />
     <Compile Include="Config\Question.cs" />
     <Compile Include="Config\ARange.cs" />
     <Compile Include="Config\Tangible.cs" />
@@ -70,7 +72,9 @@
     <Compile Include="Submissions\SubmissionData.cs" />
     <Compile Include="XmlSerializationHelpers\Answer.cs" />
     <Compile Include="XmlSerializationHelpers\Config.cs" />
+    <Compile Include="XmlSerializationHelpers\MediaDisplay.cs" />
     <Compile Include="XmlSerializationHelpers\Facet.cs" />
+    <Compile Include="XmlSerializationHelpers\PriorityQuestion.cs" />
     <Compile Include="XmlSerializationHelpers\Question.cs" />
     <Compile Include="XmlSerializationHelpers\ARange.cs" />
     <Compile Include="XmlSerializationHelpers\Response.cs" />
@@ -132,7 +136,9 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="SubmissionData_v2.xml" />
+    <Resource Include="SubmissionData_v2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

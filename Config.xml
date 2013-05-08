@@ -3,6 +3,27 @@
   <SubmissionsFileUri>SubmissionData_v2.xml</SubmissionsFileUri>
   <VideoMarker>videoMarker.svg</VideoMarker>
   <PollMarker>pollMarker.svg</PollMarker>
+  <Display>
+    <!-- Priority can be Questions/Viewpoint -->
+    <Priority>Viewpoint</Priority>
+    <Viewpoint>
+      <QuestionId>49</QuestionId>
+      <LeftAnswers>1,2,3</LeftAnswers>
+      <RightAnswers>4,5,6,7</RightAnswers>
+    </Viewpoint>
+    <PriorityQuestions>
+      <PriorityQuestion>
+        <QuestionId>88</QuestionId>
+        <LeftAnswers>1,2,4</LeftAnswers>
+        <RightAnswers>3,5</RightAnswers>
+      </PriorityQuestion>
+      <PriorityQuestion>
+        <QuestionId>48</QuestionId>
+        <LeftAnswers>1,3</LeftAnswers>
+        <RightAnswers>2,4,5</RightAnswers>
+      </PriorityQuestion>
+    </PriorityQuestions>
+  </Display>
   <Tangibles>
     <Tangible>
       <Type>viewpoint</Type>

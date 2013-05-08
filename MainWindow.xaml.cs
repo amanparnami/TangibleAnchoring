@@ -123,6 +123,8 @@ namespace TangibleAnchoring
             configData = new Config.Config(configFile);
             // Plug our item data into our visualizations
             submissionData = new Submissions.SubmissionData(configData.SubmissionsFileUri);
+            //Console.WriteLine("Display Priority is:" + configData.Display.Priority);
+
             dataPointShapes = new Shape[submissionData.Submissions.Length];
             dataPointLeftPosNoZoom = new Double[submissionData.Submissions.Length];
             dataPointTopPosNoZoom = new Double[submissionData.Submissions.Length];
@@ -311,6 +313,7 @@ namespace TangibleAnchoring
                     temp.SetValue(Canvas.TopProperty, dataPointShapes[index].GetValue(Canvas.TopProperty));
                     temp.Name = "data_" + index;
                     temp.Uid += index;
+                    temp.Tag = sData.FindResponseFromQuestionId(CurrentQuestion.Uid).MediaName;
 
                     //Dynamic assignment of touch event handler
                     temp.TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
@@ -772,7 +775,7 @@ namespace TangibleAnchoring
                         {
                             dataPointShapes[index] = new Rectangle();
                             dataPointShapes[index].Opacity = VideoPointOpacity;
-       
+                            dataPointShapes[index].Tag = sData.FindResponseFromQuestionId(CurrentQuestion.Uid).MediaName;
                         }
                         else
                         {
@@ -1000,20 +1003,42 @@ namespace TangibleAnchoring
             touchTimeCounter.Stop();
             if (touchDownShape == senderEllipse && senderEllipseType == "Rectangle" && touchTimeCounter.ElapsedMilliseconds < tapToPlayUpperTimeThreshold)
             {
-                Console.WriteLine("Tap finished after:" + touchTimeCounter.ElapsedMilliseconds + " milliseconds");
+                //Decide which side to play the video
+                string displayPriority = configData.Display.Priority;
+                string currentMediaName = senderEllipse.Tag.ToString();
+                string playSide = "";
+                Submission sData = submissionData.Submissions[int.Parse(senderEllipse.Uid)];
+
+                if(displayPriority == "Viewpoint") 
+                {
+                    string viewPointQuestionId = configData.Display.Viewpoint.QuestionId;
+                    playSide = configData.Display.FindSideFromQuesIdAnsId(viewPointQuestionId, sData.FindResponseFromQuestionId(viewPointQuestionId).AnswerId);
+                } 
+                else if (displayPriority == "Questions") 
+                {
+                    string currentQuesId = CurrentQuestion.Uid;
+                    playSide = configData.Display.FindSideFromQuesIdAnsId(currentQuesId, sData.FindResponseFromQuestionId(currentQuesId).AnswerId);
+                }
+
+                //Console.WriteLine("Tap finished after:" + touchTimeCounter.ElapsedMilliseconds + " milliseconds");
+                
                 // Prepare the reply message
-                byte[] byteData = System.Text.Encoding.ASCII.GetBytes("0.mpg\n");
+                byte[] byteData = System.Text.Encoding.ASCII.GetBytes(currentMediaName+"\n");
 
                 //// Sends data asynchronously to a connected Socket
                 //handler.BeginSend(byteData, 0, byteData.Length, 0,
                 //    new AsyncCallback(SendCallback), handler);
-                mediaServer.SideSocketMap["Left"].BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(mediaServer.SendCallback), mediaServer.SideSocketMap["Left"]);
-                mediaServer.SideSocketMap["Right"].BeginSend(byteData, 0, byteData.Length, 0,
-                new AsyncCallback(mediaServer.SendCallback), mediaServer.SideSocketMap["Right"]);
+                if (mediaServer.SideSocketMap[playSide] != null)
+                {
+                    Console.WriteLine(currentMediaName + " playing to the " + playSide);
+                    mediaServer.SideSocketMap[playSide].BeginSend(byteData, 0, byteData.Length, 0,
+                    new AsyncCallback(mediaServer.SendCallback), mediaServer.SideSocketMap[playSide]);
+                }
+                else 
+                {
+                    Console.WriteLine("No idea what to do with the touch");
+                }
             }
-            
-            
         }
         
         /// <summary>
@@ -1820,6 +1845,7 @@ namespace TangibleAnchoring
                     DrawYTicks();
                     break;
                 case 223: //Tagger
+                    TangibleSelectionMessage("");
                     tangiblesOnTable.Remove("Tagger");
                     allowTagging = false;
                     showTaggedDataPointsOnly = false;

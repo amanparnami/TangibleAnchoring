@@ -186,11 +186,19 @@ namespace TangibleAnchoring.MediaPlaying
 
                         if (str.IndexOf("Left") > -1)
                         {
+                            if (sideSocketMap.ContainsKey("Left")) 
+                            {
+                                sideSocketMap.Remove("Left");
+                            }
                             sideSocketMap.Add("Left", handler);
                             Console.WriteLine("Left handler stored");
                         }
                         else if (str.IndexOf("Right") > -1) 
                         {
+                            if (sideSocketMap.ContainsKey("Right"))
+                            {
+                                sideSocketMap.Remove("Right");
+                            }
                             sideSocketMap.Add("Right", handler);
                             Console.WriteLine("Right handler stored");
                         }

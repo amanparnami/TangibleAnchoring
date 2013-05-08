@@ -32,6 +32,15 @@ namespace TangibleAnchoring.Config
             set { questions = value; }
         }
 
+        private MediaDisplay display;
+
+        public MediaDisplay Display
+        {
+            get { return display; }
+            set { display = value; }
+        }
+
+
         public Config(string filePath)
         {
             XmlSerializationHelpers.Config xmlData = XmlSerializationHelpers.Config.Deserialize(filePath);
@@ -56,6 +65,11 @@ namespace TangibleAnchoring.Config
                 {
                     questions[index] = new Question(xmlData.Questions[index]);
                 }
+            }
+
+            if (xmlData.Display != null)
+            {
+                display = new MediaDisplay(xmlData.Display);
             }
         }
 
