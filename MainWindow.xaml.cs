@@ -13,6 +13,7 @@ using System.Globalization;
 using TangibleAnchoring.Submissions;
 using TangibleAnchoring.Config;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace TangibleAnchoring
 {
@@ -42,7 +43,7 @@ namespace TangibleAnchoring
         bool redrawPointsOnYAxisZoom = false,  redrawTicksOnYAxisZoom = false;
 
         //True: Show log messages on the left top, False: show facet labels
-        bool showLogMsg = true;
+        bool showLogMsg = false;
 
         //Following variables are declared to avoid continuous calls to setAxis and DrawPoints
         int prevXMinFacetIndex = 0,
@@ -66,8 +67,8 @@ namespace TangibleAnchoring
         List<string> tangiblesOnTable = new List<string>();
        
         // TODO Pull this out into the config.xml file
-        double DataPointWidth = 40.0;
-        double DataPointHeight = 40.0;
+        double DataPointWidth = 20.0;
+        double DataPointHeight = 20.0;
 
         double TaggedEllipseSizeOffset = 15;
 
@@ -76,7 +77,7 @@ namespace TangibleAnchoring
 
         MediaPlaying.Server mediaServer;
 
-       const string ViewpointQuestionId = "49"; //  49 is political affiliation in dummy data set
+        const string ViewpointQuestionId = "49"; //  49 is political affiliation in dummy data set
         const string AttributeRangeQuestionId = "4"; // 4 is for age in dummy data set
 
         private Criteria filterCriteria = new Criteria(ViewpointQuestionId, "All Answers");
@@ -101,6 +102,13 @@ namespace TangibleAnchoring
         private const double tagDescriptionXDistance = 190.0;
         private const double descriptionYDistance = 30.0;
 
+        private Shape touchDownShape;
+        private Stopwatch touchTimeCounter;
+
+        //This is the time for which the finger should be on the table at most 
+        //while performing the tap gesture in order to play a video
+        private int tapToPlayUpperTimeThreshold = 150; //milliseconds
+
         /// <summary>
         /// This is where it all begins. First reads the config file, then the 
         /// submissions file, initializes dataPointShapes, YAxisLength, XAxisLength, and
@@ -118,7 +126,8 @@ namespace TangibleAnchoring
             dataPointShapes = new Shape[submissionData.Submissions.Length];
             dataPointLeftPosNoZoom = new Double[submissionData.Submissions.Length];
             dataPointTopPosNoZoom = new Double[submissionData.Submissions.Length];
-            
+
+            touchTimeCounter = new Stopwatch();
 
             xDomainStart = XAxis.X1;
             xDomainEnd = XAxis.X2;
@@ -306,6 +315,8 @@ namespace TangibleAnchoring
                     //Dynamic assignment of touch event handler
                     temp.TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
                     temp.TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
+                    temp.TouchUp += new EventHandler<TouchEventArgs>(DataPointTouchUp);
+                    temp.TouchDown += new EventHandler<TouchEventArgs>(DataPointTouchDown);
 
                     // AnswerId - 1 because viewpoints are numbered from 1..7 
                     temp.Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
@@ -345,6 +356,8 @@ namespace TangibleAnchoring
                     //Dynamic assignment of touch event handler
                     temp.TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
                     temp.TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
+                    temp.TouchUp += new EventHandler<TouchEventArgs>(DataPointTouchUp);
+                    temp.TouchDown += new EventHandler<TouchEventArgs>(DataPointTouchDown);
 
                     // AnswerId - 1 because viewpoints are numbered from 1..7 
                     temp.Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
@@ -378,6 +391,10 @@ namespace TangibleAnchoring
 
         }
 
+        public static string GetElapsedDuration(Stopwatch st)
+        {
+            return st == null ? string.Empty : st.Elapsed.ToString(@"hh\:mm\:ss\:fff");
+        }
 
         #endregion Helper_Functions
 
@@ -804,14 +821,15 @@ namespace TangibleAnchoring
                         //Dynamic assignment of touch event handler
                         dataPointShapes[index].TouchEnter += new EventHandler<TouchEventArgs>(DataPointTouchEnter);
                         dataPointShapes[index].TouchLeave += new EventHandler<TouchEventArgs>(DataPointTouchLeave);
+                        dataPointShapes[index].TouchUp += new EventHandler<TouchEventArgs>(DataPointTouchUp);
+                        dataPointShapes[index].TouchDown += new EventHandler<TouchEventArgs>(DataPointTouchDown);
                         dataPointShapes[index].Height = DataPointHeight;
                         dataPointShapes[index].Width = DataPointWidth;
 
                         // AnswerId - 1 because viewpoints are numbered from 1..7 
                         dataPointShapes[index].Fill = viewpointColors[int.Parse(sData.Responses[0].AnswerId) - 1];
                         
-                        MainCanvas.Children.Add(dataPointShapes[index]);
-                        
+                        MainCanvas.Children.Add(dataPointShapes[index]);     
                     }
                     BackupDataPointPositions();
                 }
@@ -869,24 +887,6 @@ namespace TangibleAnchoring
 
                             dataPointShapes[index].SetValue(Canvas.LeftProperty, leftPosition);
                             dataPointShapes[index].SetValue(Canvas.TopProperty, topPosition);
-
-                            //if (leftPosition < xRangeStart || leftPosition >= xRangeEnd)
-                            //{
-                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                            //    if (taggedEllipses.ContainsKey("tag_" + index))
-                            //    {
-                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                            //    }
-                            //}
-
-                            //if (topPosition < yRangeEnd || topPosition >= yRangeStart)
-                            //{
-                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                            //    if (taggedEllipses.ContainsKey("tag_" + index))
-                            //    {
-                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                            //    }
-                            //}
                         }
                         BackupDataPointPositions();
                         redrawPointsOnAxisChange = false;
@@ -905,15 +905,10 @@ namespace TangibleAnchoring
                             Submissions.Submission sData = submissionData.Submissions[index];
                             string answerIdForXAxis = sData.FindResponseFromQuestionId(XAxis.Uid).AnswerId;
                             int rangeXAxis = configData.FindQuestionFromId(XAxis.Uid).Answers.Length;
-                            //double leftPosition = getTickFromId("xaxis", answerIdForXAxis).X1 + r.Next(20) ;
                             int xTickInterval = (int)(XAxisLength / rangeXAxis);
-                            //double leftPosition = YAxis.X1 + xTickInterval * (int.Parse(answerIdForXAxis) - 1) + r.Next(xTickInterval);
-
-
                            
                             double currentTopPosition = (double) dataPointShapes[index].GetValue(Canvas.TopProperty) ;
                             dataPointShapes[index].SetValue(Canvas.LeftProperty, newLeftPosition);
-                           // dataPointShapes[index].SetValue(Canvas.TopProperty, currentTopPosition);
 
                             if (taggedEllipses.ContainsKey("tag_" + index))
                             {
@@ -921,22 +916,6 @@ namespace TangibleAnchoring
                                 taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, currentTopPosition - TaggedEllipseSizeOffset / 2);
                             }
 
-                            //if (newLeftPosition < xRangeStart || newLeftPosition >= xRangeEnd)
-                            //{
-                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                            //    if (taggedEllipses.ContainsKey("tag_" + index))
-                            //    {
-                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                            //    }
-                            //}
-                            //if (currentTopPosition < yRangeEnd || currentTopPosition >= yRangeStart)
-                            //{
-                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                            //    if (taggedEllipses.ContainsKey("tag_" + index))
-                            //    {
-                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                            //    }
-                            //}
                         }
                         redrawPointsOnXAxisZoom = false;
                     }
@@ -973,24 +952,6 @@ namespace TangibleAnchoring
                                 taggedEllipses["tag_" + index].SetValue(Canvas.LeftProperty, currentLeftPosition - TaggedEllipseSizeOffset/2);
                                 taggedEllipses["tag_" + index].SetValue(Canvas.TopProperty, newTopPosition - TaggedEllipseSizeOffset/2);
                             }
-
-                            //if (currentLeftPosition < xRangeStart || currentLeftPosition >= xRangeEnd)
-                            //{
-                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                            //    if (taggedEllipses.ContainsKey("tag_" + index))
-                            //    {
-                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                            //    }
-                            //}
-
-                            //if (newTopPosition < yRangeEnd || newTopPosition >= yRangeStart)
-                            //{
-                            //    dataPointShapes[index].Visibility = System.Windows.Visibility.Hidden;
-                            //    if (taggedEllipses.ContainsKey("tag_" + index))
-                            //    {
-                            //        taggedEllipses["tag_" + index].Visibility = System.Windows.Visibility.Hidden;
-                            //    }
-                            //}
                         }
                         redrawPointsOnYAxisZoom = false;
                     }
@@ -1012,6 +973,49 @@ namespace TangibleAnchoring
         #endregion Drawing_Functions
 
         #region Touch_Handlers_N_Helpers
+        /// <summary>
+        /// Touch Event handler for dynamically added data point.
+        /// </summary>
+        /// <param name="sender">element that invokes this handler (e.g an Ellipse)</param>
+        /// <param name="e">touch event information such type of device</param>
+        private void DataPointTouchDown(object sender, TouchEventArgs e)
+        {
+            Shape senderEllipse = sender as Shape;
+            touchDownShape = senderEllipse;
+            touchTimeCounter.Reset();
+            touchTimeCounter.Start();
+            Console.WriteLine("Touch Down");
+        }
+
+        /// <summary>
+        /// Touch Event handler for dynamically added data point.
+        /// </summary>
+        /// <param name="sender">element that invokes this handler (e.g an Ellipse)</param>
+        /// <param name="e">touch event information such type of device</param>
+        private void DataPointTouchUp(object sender, TouchEventArgs e)
+        {
+            Shape senderEllipse = sender as Shape;
+            string senderEllipseType = (senderEllipse.GetType().ToString() == "System.Windows.Shapes.Rectangle") ? "Rectangle" : "Ellipse";
+
+            touchTimeCounter.Stop();
+            if (touchDownShape == senderEllipse && senderEllipseType == "Rectangle" && touchTimeCounter.ElapsedMilliseconds < tapToPlayUpperTimeThreshold)
+            {
+                Console.WriteLine("Tap finished after:" + touchTimeCounter.ElapsedMilliseconds + " milliseconds");
+                // Prepare the reply message
+                byte[] byteData = System.Text.Encoding.ASCII.GetBytes("0.mpg\n");
+
+                //// Sends data asynchronously to a connected Socket
+                //handler.BeginSend(byteData, 0, byteData.Length, 0,
+                //    new AsyncCallback(SendCallback), handler);
+                mediaServer.SideSocketMap["Left"].BeginSend(byteData, 0, byteData.Length, 0,
+                new AsyncCallback(mediaServer.SendCallback), mediaServer.SideSocketMap["Left"]);
+                mediaServer.SideSocketMap["Right"].BeginSend(byteData, 0, byteData.Length, 0,
+                new AsyncCallback(mediaServer.SendCallback), mediaServer.SideSocketMap["Right"]);
+            }
+            
+            
+        }
+        
         /// <summary>
         /// Touch Event handler for dynamically added data point.
         /// </summary>
@@ -1063,13 +1067,14 @@ namespace TangibleAnchoring
                     MainCanvas.Children.Remove(taggedEllipses["tag_" + submissionIndex]);
                     taggedEllipses.Remove("tag_" + submissionIndex); 
                 }
-
             }
             else
             {
+                MainCanvas.Children.Remove(haloEllipse);
                 if (senderEllipseType == "Rectangle")
                 {
                     haloEllipse = new Rectangle();
+                    
                 }
                 else
                 {
@@ -1082,7 +1087,7 @@ namespace TangibleAnchoring
                 haloEllipse.Width = DataPointHeight + TaggedEllipseSizeOffset;
                 haloEllipse.Stroke = Brushes.AntiqueWhite;
                 haloEllipse.StrokeThickness = 2;
-                MainCanvas.Children.Remove(haloEllipse); //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
+                 //FIX: Next line throws ArgumentException if another haloEllipse exists while new is added.
                 MainCanvas.Children.Add(haloEllipse);
             }
 
@@ -1888,5 +1893,7 @@ namespace TangibleAnchoring
             //TODO: disable audio, animations here
         }
         #endregion System_Window_Event_Handlers
+
+        public object DataPointDoubleTouch { get; set; }
     }
 }

@@ -10,6 +10,22 @@ namespace TangibleAnchoring.MediaPlaying
 {
     public class Server
     {
+        private Socket sListener;
+
+        public Socket SListener
+        {
+            get { return sListener; }
+            set { sListener = value; }
+        }
+
+        private Dictionary<string, Socket> sideSocketMap;
+
+        public Dictionary<string, Socket> SideSocketMap
+        {
+            get { return sideSocketMap; }
+            set { sideSocketMap = value; }
+        }
+
         public Server()
         {
             // Creates one SocketPermission object for access restrictions
@@ -21,8 +37,8 @@ namespace TangibleAnchoring.MediaPlaying
                 );
 
             // Listening Socket object
-            Socket sListener = null;
-
+            sListener = null;
+            sideSocketMap = new Dictionary<string, Socket>();
             try
             {
                 // Ensures the code to have permission to access a Socket
@@ -69,6 +85,7 @@ namespace TangibleAnchoring.MediaPlaying
 
             if (sListener.Connected)
             {
+                Console.WriteLine("Why does it enter this ...");
                 sListener.Shutdown(SocketShutdown.Receive);
                 sListener.Close();
             }
@@ -81,7 +98,7 @@ namespace TangibleAnchoring.MediaPlaying
         /// </summary>     
         /// <param name="ar">the status of an asynchronous operation
         /// </param> 
-        public static void AcceptCallback(IAsyncResult ar)
+        public void AcceptCallback(IAsyncResult ar)
         {
             Socket listener = null;
             Console.WriteLine("Inside Accept Callback");
@@ -95,7 +112,7 @@ namespace TangibleAnchoring.MediaPlaying
                 listener = (Socket)ar.AsyncState;
                 // Create a new socket
                 handler = listener.EndAccept(ar);
-
+                
                 // Using the Nagle algorithm
                 handler.NoDelay = false;
 
@@ -130,7 +147,7 @@ namespace TangibleAnchoring.MediaPlaying
         /// <param name="ar">
         /// the status of an asynchronous operation
         /// </param> 
-        public static void ReceiveCallback(IAsyncResult ar)
+        public void ReceiveCallback(IAsyncResult ar)
         {
             Console.WriteLine("Inside Receive Callback");
             try
@@ -148,35 +165,42 @@ namespace TangibleAnchoring.MediaPlaying
                 // Received message
                 string content = string.Empty;
 
-                
-
                 // The number of bytes received.
                 int bytesRead = handler.EndReceive(ar);
                 Console.WriteLine("BytesRead:"+bytesRead);
                 if (bytesRead > 0)
                 {
                     content += System.Text.Encoding.ASCII.GetString(buffer);
-                   // Console.WriteLine(content);
-                   // Console.WriteLine(content);
-                    //Console.WriteLine("Index of <Client Quit>: " + content.IndexOf("<Client Quit>"));
+                   
                     // If message contains "<Client Quit>", finish receiving
                     if (content.IndexOf("<Client Quit>") > -1)
                     {
                         Console.WriteLine("Read EOM");
                         // Convert byte array to string
                         string str =
-                            content.Substring(0, content.LastIndexOf("<Client Quit>"));
+                            content.Substring(0, content.LastIndexOf("<Client Quit>")).Trim();
                         Console.WriteLine(
                             "Read {0} bytes from client.\n Data: {1}",
                             str.Length * 2, str);
-                        str += '\n';
-                        // Prepare the reply message
-                        byte[] byteData = System.Text.Encoding.ASCII.GetBytes("0.mpg\n");
-                            //Encoding.Unicode.GetBytes(str);
+                        //str += '\n';
 
-                        // Sends data asynchronously to a connected Socket
-                        handler.BeginSend(byteData, 0, byteData.Length, 0,
-                            new AsyncCallback(SendCallback), handler);
+                        if (str.IndexOf("Left") > -1)
+                        {
+                            sideSocketMap.Add("Left", handler);
+                            Console.WriteLine("Left handler stored");
+                        }
+                        else if (str.IndexOf("Right") > -1) 
+                        {
+                            sideSocketMap.Add("Right", handler);
+                            Console.WriteLine("Right handler stored");
+                        }
+
+                        // Prepare the reply message
+                        //byte[] byteData = System.Text.Encoding.ASCII.GetBytes("0.mpg\n");
+                        
+                        //// Sends data asynchronously to a connected Socket
+                        //handler.BeginSend(byteData, 0, byteData.Length, 0,
+                        //    new AsyncCallback(SendCallback), handler);
                     }
                     else
                     {
@@ -203,7 +227,7 @@ namespace TangibleAnchoring.MediaPlaying
         /// <param name="ar">
         /// The status of an asynchronous operation
         /// </param> 
-        public static void SendCallback(IAsyncResult ar)
+        public void SendCallback(IAsyncResult ar)
         {
             Console.WriteLine("Inside Send Callback");
             try
@@ -220,6 +244,11 @@ namespace TangibleAnchoring.MediaPlaying
             {
                 Console.WriteLine("Exception: {0}", ex.ToString());
             }
+        }
+
+        public void SendVideoPlayRequest(string side, string mediaName)
+        {
+
         }
     }
 }
