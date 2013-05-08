@@ -74,6 +74,8 @@ namespace TangibleAnchoring
         double VideoPointOpacity = 1.0;
         double RegularPointOpacity = 0.6;
 
+        MediaPlaying.Server mediaServer;
+
        const string ViewpointQuestionId = "49"; //  49 is political affiliation in dummy data set
         const string AttributeRangeQuestionId = "4"; // 4 is for age in dummy data set
 
@@ -152,7 +154,7 @@ namespace TangibleAnchoring
             }
 
             InitScatterplot("88", "All Answers", "46", AttributeRangeQuestionId);
-           
+            mediaServer = new MediaPlaying.Server();
         }
 
         /// <summary>
