@@ -36,6 +36,9 @@ namespace TangibleAnchoring.MediaPlaying
                 SocketPermission.AllPorts // Specifies all ports
                 );
 
+            string serverIpAddress = "143.215.204.248";
+            int serverPort = 4510;
+
             // Listening Socket object
             sListener = null;
             sideSocketMap = new Dictionary<string, Socket>();
@@ -48,10 +51,10 @@ namespace TangibleAnchoring.MediaPlaying
                 IPHostEntry ipHost = Dns.GetHostEntry("");
 
                 // Gets first IP address associated with a localhost
-                IPAddress ipAddr = IPAddress.Parse("143.215.204.248");//ipHost.AddressList[0];
+                IPAddress ipAddr = IPAddress.Parse(serverIpAddress);//ipHost.AddressList[0];
 
                 // Creates a network endpoint
-                IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, 4510);
+                IPEndPoint ipEndPoint = new IPEndPoint(ipAddr, serverPort);
 
                 // Create one Socket object to listen the incoming connection
                 sListener = new Socket(
