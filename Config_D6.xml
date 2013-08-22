@@ -1,0 +1,417 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Config>
+  <SubmissionsFileUri>SubmissionData_D6.xml</SubmissionsFileUri>
+  <VideoMarker>videoMarker.svg</VideoMarker>
+  <PollMarker>pollMarker.svg</PollMarker>
+  <Display>
+    <!-- Priority can be Questions/Viewpoint -->
+    <Priority>Questions</Priority>
+    <Viewpoint>
+      <QuestionId>24</QuestionId>
+      <LeftAnswers>1,2,3</LeftAnswers>
+      <RightAnswers>4,5</RightAnswers>
+    </Viewpoint>
+    <PriorityQuestions>
+      <PriorityQuestion>
+        <QuestionId>1</QuestionId>
+        <LeftAnswers>1,2,6</LeftAnswers>
+        <RightAnswers>3,4,5</RightAnswers>
+      </PriorityQuestion>
+      <PriorityQuestion>
+        <QuestionId>42</QuestionId>
+        <LeftAnswers>1,4</LeftAnswers>
+        <RightAnswers>2,3,5</RightAnswers>
+      </PriorityQuestion>
+      <PriorityQuestion>
+        <QuestionId>58</QuestionId>
+        <LeftAnswers>1,3</LeftAnswers>
+        <RightAnswers>2</RightAnswers>
+      </PriorityQuestion>
+      <PriorityQuestion>
+        <QuestionId>60</QuestionId>
+        <LeftAnswers>1,2</LeftAnswers>
+        <RightAnswers>3,4,5</RightAnswers>
+      </PriorityQuestion>
+      <PriorityQuestion>
+        <QuestionId>9</QuestionId>
+        <LeftAnswers>1</LeftAnswers>
+        <RightAnswers>2</RightAnswers>
+      </PriorityQuestion>
+    </PriorityQuestions>
+  </Display>
+  <Tangibles>
+    <Tangible>
+      <Type>viewpoint</Type>
+      <TagId>212</TagId>
+      <Name>Involvement</Name>
+      <file>partyFilter_blue.svg</file>
+      <Color>29,113,184</Color>
+      <selectorFile>partySelector_blue.svg</selectorFile>
+      <Rotation>
+        <Facet>
+          <Type>single</Type>
+          <Label>Not Very Involved</Label>
+          <QuestionId>23</QuestionId>
+          <AnswerIds>1</AnswerIds>
+          <Color>29,113,184</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>Somewhat Involved</Label>
+          <QuestionId>23</QuestionId>
+          <AnswerIds>2</AnswerIds>
+          <Color>29,113,184</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>Actively Involved</Label>
+          <QuestionId>23</QuestionId>
+          <AnswerIds>3</AnswerIds>
+          <Color>29,113,184</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>Leading Action</Label>
+          <QuestionId>23</QuestionId>
+          <AnswerIds>4</AnswerIds>
+          <Color>29,113,184</Color>
+        </Facet>
+      </Rotation>
+    </Tangible>
+    <Tangible>
+      <Type>viewpoint</Type>
+      <TagId>222</TagId>
+      <Name>Political Leaning</Name>
+      <file>partyFilter_red.svg</file>
+      <Color>227,6,19</Color>
+      <selectorFile>partySelector_red.svg</selectorFile>
+      <Rotation>
+        <Facet>
+          <Type>single</Type>
+          <Label>Very liberal</Label>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>1</AnswerIds>
+          <Color>227,6,1</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>Somewhat liberal</Label>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>2</AnswerIds>
+          <Color>227,6,19</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>In the middle</Label>
+          <QuestionId>3</QuestionId>
+          <AnswerIds>7</AnswerIds>
+          <Color>227,6,1</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>Somewhat conservative</Label>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>4</AnswerIds>
+          <Color>227,6,1</Color>
+        </Facet>
+        <Facet>
+          <Type>single</Type>
+          <Label>Leading action</Label>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>4</AnswerIds>
+          <Color>227,6,1</Color>
+        </Facet>
+      </Rotation>
+    </Tangible>
+    <Tangible>
+      <Type>axisStart</Type>
+      <TagId>214</TagId>
+      <Name>xAxisStart</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+      <Rotation>
+        <Facet>
+          <Label>Involvement</Label>
+          <Type>nominal</Type>
+          <QuestionId>23</QuestionId>
+          <AnswerIds>1,2,3,4</AnswerIds>
+          <FacetRange>1,4,1</FacetRange>
+        </Facet>
+        <Facet>
+          <Label>Political Leaning</Label>
+          <Type>nominal</Type>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>1,2,3,4,5</AnswerIds>
+          <FacetRange>1,5,1</FacetRange>
+        </Facet>
+      </Rotation>
+    </Tangible>
+    <Tangible>
+      <Type>axisEnd</Type>
+      <TagId>209</TagId>
+      <Name>xAxisEnd</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+    </Tangible>
+    <Tangible>
+      <Type>axisStart</Type>
+      <TagId>211</TagId>
+      <Name>yAxisStart</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+      <Rotation>
+        <Facet>
+          <Label>Age</Label>
+          <Type>ratio</Type>
+          <QuestionId>4</QuestionId>
+          <!-- startValue,endValue, increment-->
+          <FacetRange>0,100,1</FacetRange>
+        </Facet>
+      </Rotation>
+    </Tangible>
+    <Tangible>
+      <Type>axisEnd</Type>
+      <TagId>215</TagId>
+      <Name>yAxisEnd</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+    </Tangible>
+    <Tangible>
+      <Type>questionChanger</Type>
+      <TagId>208</TagId>
+      <Name>Q?</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+      <Rotation>
+        <Facet>
+          <Label>Question 1</Label>
+          <Type>simple</Type>
+          <QuestionId>1</QuestionId>
+          <AnswerIds></AnswerIds>
+        </Facet>
+        <Facet>
+          <Label>Question 42</Label>
+          <Type>simple</Type>
+          <QuestionId>42</QuestionId>
+          <AnswerIds></AnswerIds>
+        </Facet>
+        <Facet>
+          <Label>Question 58</Label>
+          <Type>simple</Type>
+          <QuestionId>58</QuestionId>
+          <AnswerIds></AnswerIds>
+        </Facet>
+        <Facet>
+          <Label>Question 60</Label>
+          <Type>simple</Type>
+          <QuestionId>60</QuestionId>
+          <AnswerIds></AnswerIds>
+        </Facet>
+        <Facet>
+          <Label>Question 9</Label>
+          <Type>simple</Type>
+          <QuestionId>9</QuestionId>
+          <AnswerIds></AnswerIds>
+        </Facet>
+      </Rotation>
+    </Tangible>
+    <Tangible>
+      <Type>answerChanger</Type>
+      <TagId>213</TagId>
+      <Name>A's</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+      <Rotation>
+        <Facet></Facet>
+      </Rotation>
+    </Tangible>
+    <Tangible>
+      <Type>tagger</Type>
+      <TagId>223</TagId>
+      <Name>tag&amp;compare</Name>
+      <file>0</file>
+      <Color>0</Color>
+      <selectorFile>0</selectorFile>
+    </Tangible>
+  </Tangibles>
+  <Questions>
+    <Question>
+      <QuestionId>1</QuestionId>
+      <QuestionText>Most Important Issue? List #1</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Housing</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>Health issues</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>3</AnswerId>
+          <AnswerText>Population, growth, dev</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>4</AnswerId>
+          <AnswerText>Immigration</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>5</AnswerId>
+          <AnswerText>Drugs &amp; drug abuse</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>6</AnswerId>
+          <AnswerText>Other</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>42</QuestionId>
+      <QuestionText>Most Important Issue? List #2</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Traffic &amp; Transportation</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>Schools &amp; Education</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>3</AnswerId>
+          <AnswerText>Crime &amp; Gangs</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>4</AnswerId>
+          <AnswerText>Environment &amp; pollution</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>5</AnswerId>
+          <AnswerText>Jobs &amp; economy</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>5</AnswerId>
+          <AnswerText>Other</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>58</QuestionId>
+      <QuestionText>Does Atlanta need a new stadium?</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Yes</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>No</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>3</AnswerId>
+          <AnswerText>Maybe</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>60</QuestionId>
+      <QuestionText>Use motel hotel tax for stadium?</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Strongly Oppose</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>Oppose</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>3</AnswerId>
+          <AnswerText>Neutral</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>4</AnswerId>
+          <AnswerText>Support</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>5</AnswerId>
+          <AnswerText>Strongly Support</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>9</QuestionId>
+      <QuestionText>Add a Question to Survey?</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Yes</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>No</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>23</QuestionId>
+      <QuestionText>How involved are  you in neighborhood issues?</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Not much</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>Somewhat</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>3</AnswerId>
+          <AnswerText>Active</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>4</AnswerId>
+          <AnswerText>Leading Action</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>24</QuestionId>
+      <QuestionText>In politics, I am ...</QuestionText>
+      <Answers>
+        <Answer>
+          <AnswerId>1</AnswerId>
+          <AnswerText>Very liberal</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>2</AnswerId>
+          <AnswerText>Somehwat liberal</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>3</AnswerId>
+          <AnswerText>In the middle</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>4</AnswerId>
+          <AnswerText>Somewhat conservative</AnswerText>
+        </Answer>
+        <Answer>
+          <AnswerId>5</AnswerId>
+          <AnswerText>Very conservative</AnswerText>
+        </Answer>
+      </Answers>
+    </Question>
+    <Question>
+      <QuestionId>4</QuestionId>
+      <QuestionText>AGE</QuestionText>
+      <!-- startValue,endValue,increment-->
+      <AnswerRange>0,100,1</AnswerRange>
+    </Question>
+  </Questions>
+</Config>
