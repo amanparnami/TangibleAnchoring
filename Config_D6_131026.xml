@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Config>
-  <SubmissionsFileUri>Submissions_TEST.xml</SubmissionsFileUri>
+  <SubmissionsFileUri>Submissions_D6_131026.xml</SubmissionsFileUri>
   <VideoMarker>videoMarker.svg</VideoMarker>
   <PollMarker>pollMarker.svg</PollMarker>
   <Display>
@@ -9,17 +9,17 @@
     <Viewpoint>
       <QuestionId>24</QuestionId>
       <LeftAnswers>1,2,3</LeftAnswers>
-      <RightAnswers>4,5</RightAnswers>
+      <RightAnswers>4,5,6</RightAnswers>
     </Viewpoint>
     <PriorityQuestions>
       <PriorityQuestion>
         <QuestionId>1</QuestionId>
-        <LeftAnswers>1,2,6</LeftAnswers>
+        <LeftAnswers>1,2,6,7</LeftAnswers>
         <RightAnswers>3,4,5</RightAnswers>
       </PriorityQuestion>
       <PriorityQuestion>
         <QuestionId>42</QuestionId>
-        <LeftAnswers>1,4</LeftAnswers>
+        <LeftAnswers>1,4,6</LeftAnswers>
         <RightAnswers>2,3,5</RightAnswers>
       </PriorityQuestion>
       <PriorityQuestion>
@@ -103,8 +103,8 @@
         <Facet>
           <Type>single</Type>
           <Label>In the middle</Label>
-          <QuestionId>3</QuestionId>
-          <AnswerIds>7</AnswerIds>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>3</AnswerIds>
           <Color>227,6,1</Color>
         </Facet>
         <Facet>
@@ -114,14 +114,21 @@
           <AnswerIds>4</AnswerIds>
           <Color>227,6,1</Color>
         </Facet>
-        <Facet>
+		 <Facet>
           <Type>single</Type>
-          <Label>Leading action</Label>
+          <Label>Very conservative</Label>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>5</AnswerIds>
+          <Color>227,6,1</Color>
+        </Facet>
+		 <Facet>
+          <Type>single</Type>
+          <Label>Other</Label>
           <QuestionId>24</QuestionId>
           <AnswerIds>4</AnswerIds>
           <Color>227,6,1</Color>
         </Facet>
-      </Rotation>
+	  </Rotation>
     </Tangible>
     <Tangible>
       <Type>axisStart</Type>
@@ -132,18 +139,18 @@
       <selectorFile>0</selectorFile>
       <Rotation>
         <Facet>
-          <Label>Most Important?</Label>
+          <Label>Involvement</Label>
           <Type>nominal</Type>
-          <QuestionId>1</QuestionId>
-          <AnswerIds>1,2,3,4,5,6</AnswerIds>
-          <FacetRange>1,6,1</FacetRange>
+          <QuestionId>23</QuestionId>
+          <AnswerIds>1,2,3,4</AnswerIds>
+          <FacetRange>1,4,1</FacetRange>
         </Facet>
         <Facet>
-          <Label>New Stadium</Label>
+          <Label>Political Leaning</Label>
           <Type>nominal</Type>
-          <QuestionId>58</QuestionId>
-          <AnswerIds>1,2,3</AnswerIds>
-          <FacetRange>1,3,1</FacetRange>
+          <QuestionId>24</QuestionId>
+          <AnswerIds>1,2,3,4,5,6</AnswerIds>
+          <FacetRange>1,6,1</FacetRange>
         </Facet>
       </Rotation>
     </Tangible>
@@ -267,6 +274,10 @@
         </Answer>
         <Answer>
           <AnswerId>6</AnswerId>
+          <AnswerText>Poverty/homeless/social</AnswerText>
+        </Answer>
+		<Answer>
+          <AnswerId>7</AnswerId>
           <AnswerText>Other</AnswerText>
         </Answer>
       </Answers>
@@ -405,13 +416,17 @@
           <AnswerId>5</AnswerId>
           <AnswerText>Very conservative</AnswerText>
         </Answer>
+		<Answer>
+          <AnswerId>6</AnswerId>
+          <AnswerText>Other</AnswerText>
+        </Answer>
       </Answers>
     </Question>
     <Question>
       <QuestionId>4</QuestionId>
       <QuestionText>AGE</QuestionText>
       <!-- startValue,endValue,increment-->
-      <AnswerRange>0,100,1</AnswerRange>
+      <AnswerRange>0,80,1</AnswerRange>
     </Question>
   </Questions>
 </Config>
