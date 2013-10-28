@@ -14,7 +14,7 @@
              Height="36" 
             Margin="290,182,74,182"></Polygon>
         <Ellipse Stroke="Chocolate"
-             StrokeThickness="21"
+             StrokeThickness="5"
              Fill="{x:Null}"
              x:Name="myEllipse"
              VerticalAlignment="Stretch"

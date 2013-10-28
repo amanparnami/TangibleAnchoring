@@ -65,8 +65,8 @@
 
                 <!--Uid will contain the questionId corresponding to the parameter-->
                 <Line Name = "XAxis"
-                      Stroke = "DarkSlateGray"
-                      StrokeThickness="1"
+                      Stroke = "White"
+                      StrokeThickness="3"
                       X1 = "160"
             Y1 = "920"
             X2 = "1800"
@@ -85,8 +85,8 @@
                 <!--Uid will contain the questionId corresponding to the parameter-->
                 <Line Name = "YAxis"
                       Uid=""
-                      Stroke = "DarkSlateGray"
-                      StrokeThickness="1"
+                      Stroke = "White"
+                      StrokeThickness="3"
                       X1 = "160"
             Y1 = "120"
             X2 = "160"

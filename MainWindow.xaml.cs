@@ -22,7 +22,7 @@ namespace TangibleAnchoring
     /// </summary>
     public partial class MainWindow : SurfaceWindow
     {
-        private const string configFile = "Config.xml";
+        private const string configFile = "Config_D6_131026.xml";
         private readonly Config.Config configData;
         private readonly Submissions.SubmissionData submissionData;
         private Shape[] dataPointShapes;
@@ -67,8 +67,8 @@ namespace TangibleAnchoring
         List<string> tangiblesOnTable = new List<string>();
        
         // TODO Pull this out into the config.xml file
-        double DataPointWidth = 20.0;
-        double DataPointHeight = 20.0;
+        double DataPointWidth = 40.0;
+        double DataPointHeight = 40.0;
 
         double TaggedEllipseSizeOffset = 15;
 
@@ -77,7 +77,7 @@ namespace TangibleAnchoring
 
         MediaPlaying.Server mediaServer;
 
-        const string ViewpointQuestionId = "49"; //  49 is political affiliation in dummy data set
+        const string ViewpointQuestionId = "1"; //  49 is political affiliation in dummy data set
         const string AttributeRangeQuestionId = "4"; // 4 is for age in dummy data set
 
         private Criteria filterCriteria = new Criteria(ViewpointQuestionId, "All Answers");
@@ -164,7 +164,7 @@ namespace TangibleAnchoring
                 TangibleSelection.Visibility = System.Windows.Visibility.Visible;
             }
 
-            InitScatterplot("88", "All Answers", "46", AttributeRangeQuestionId);
+            InitScatterplot("58", "All Answers", "42", AttributeRangeQuestionId);
             mediaServer = new MediaPlaying.Server();
         }
 
@@ -436,7 +436,7 @@ namespace TangibleAnchoring
                     {
                         Line tick = new Line();
                         tick.Name = "YTick_" + index;
-                        tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                        tick.Stroke = System.Windows.Media.Brushes.White;
                         tick.X1 = YAxis.X1 - 10.00;
                         tick.Y1 = YAxis.Y1 + (numAnswers - index) * step;
                         tick.X2 = YAxis.X1 + 10.00;
@@ -482,7 +482,7 @@ namespace TangibleAnchoring
                         {
                             Line tick = new Line();
                             tick.Name = "YTick_" + index;
-                            tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                            tick.Stroke = System.Windows.Media.Brushes.White;
                             tick.X1 = YAxis.X1 - 10.00;
                             tick.Y1 = YAxis.Y1 + (endValue - index) * step;
                             tick.X2 = YAxis.X1 + 10.00;
@@ -515,7 +515,7 @@ namespace TangibleAnchoring
                         {
                             Line tick = new Line();
                             tick.Name = "YTick_" + index;
-                            tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                            tick.Stroke = System.Windows.Media.Brushes.White;
                             tick.X1 = YAxis.X1 - 10.00;
                             tick.Y1 = YAxis.Y1 + (10 - index) * step;
                             tick.X2 = YAxis.X1 + 10.00;
@@ -689,7 +689,7 @@ namespace TangibleAnchoring
 
                     Line tick = new Line();
                     tick.Name = "XTick_" + index;
-                    tick.Stroke = System.Windows.Media.Brushes.DarkSlateGray;
+                    tick.Stroke = System.Windows.Media.Brushes.White;
                     tick.X1 = XAxis.X1 + index * step;
                     tick.Y1 = XAxis.Y1 - 10.00;
                     tick.X2 = tick.X1;
